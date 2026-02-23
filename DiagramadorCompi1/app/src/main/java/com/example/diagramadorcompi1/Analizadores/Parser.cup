@@ -1,0 +1,28 @@
+package com.example.diagramadorcompi1.Analizadores;
+
+import java_cup.runtime.Symbol;
+import com.example.test.model.*;
+/* Ir agregando conforme se hacen las estructuras
+import com.example.test.patron.Instruction;
+import com.example.test.instruction.Print;
+import com.example.test.instruction.variable.*;
+import com.example.test.expression.Native;
+import com.example.test.expression.arithmetic.Plus;
+import com.example.test.expression.logic.Or;
+import com.example.test.expression.relational.Greather;
+*/
+import java.util.List;
+import java.util.ArrayList;
+import java.util.LinkedList;
+
+parser code
+{:
+
+:}
+
+action code
+{:
+
+    String console = "";
+
+:}
