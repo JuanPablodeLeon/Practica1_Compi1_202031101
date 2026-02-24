@@ -12,7 +12,7 @@ import java.util.LinkedList;
 
 parser code
 {:
-
+    //agregar lista para erroes sintacticos
 :}
 
 action code
@@ -44,6 +44,9 @@ terminal COMA, SEPARADOR_CONFIG;
 nonterminal LinkedList<Instruccion> iniciacion, instrucciones;
 nonterminal Instruccion instruccion, print;
 nonterminal Instruccion inicio, bloque_codigo;
+nonterminal Instruccion codigo, bloque, estruc_mostrar, estruc_si;
+nonterminal Instruccion estruc_mientras;
+nonterminal Instruccion variable, op_matematica, estruc_leer;
 
 precedence left OR, AND;
 precedence left MAYOR_IGUAL_QUE;
@@ -64,8 +67,33 @@ instrucciones ::= instrucciones:a instruccion:b {: RESULT = a; RESULT.add(b); :}
 instruccion ::= print:a {: RESULT = a; :}
                 | inicio:a {: RESULT = a; :}
                 ;
-inicio ::= bloque_codigo:b SEPARADOR:a {: RESULT = b; RESULT = new Native(a, new Type(TypeData.SEPARADOR), aleft, aright);:}
+
+inicio ::= INICIO codigo:a FIN SEPARADOR {: RESULT = a; :}
         ;
 
-bloque_codigo ::= INICIO:a FIN:b {: RESULT = new Native(a, new Type(TypeData.STRING), aleft, aright); RESULT = new Native(b, new Type(TypeData.STRING), aleft, aright);:}
+codigo ::= bloque:a {: RESULT = a; :}
+         | estruc_si:a {: RESULT = a; :}
+         | estruc_mientras:a {: RESULT = a; :}
+        ;
+
+bloque ::= variable:a {: RESULT = a; :}
+         | estruc_mostrar:a {: RESULT = a; :}
+         | estruc_leer:a {: RESULT = a; :}
+        ;
+
+variable ::=  VAR IDENTIFICADOR:a ASIGNACION op_matematica:b {: RESULT = new Declaracion((String) a, b, aleft, aright); :}
+            | VAR IDENTIFICADOR:a {: RESULT = new Declaracion((String) a, null, aleft, aright); :}
+            | IDENTIFICADOR:a ASIGNACION op_matematica:b {: RESULT = new Declaracion((String) a, b, aleft, aright); :}
+            ;
+
+estruc_mostrar ::= MOSTRAR TEXTO:a {: RESULT = new Native(a,new Type(TypeData.STRING), aleft, aright); :}
+                ;
+
+estruc_leer ::= LEER IDENTIFICADOR:a {: RESULT = new Native(a,new Type(TypeData.STRING), aleft, aright); :}
+             ;
+
+op_matematica ::= IDENTIFICADOR:a {: RESULT = new AccesVariable((String) a, aleft, aright); :}
+                |DECIMAL:a {: RESULT = new Native(Double.parseDouble(a.toString()), new Type(TypeData.DECIMAL), aleft, aright); :}
+                | ENTEROS:a {: RESULT = new Native(Integer.parseInt(a.toString()), new Type(TypeData.ENTERO), aleft, aright); :}
+                | TEXTO:a {: RESULT = new Native(a,new Type(TypeData.STRING), aleft, aright); :}
                 ;

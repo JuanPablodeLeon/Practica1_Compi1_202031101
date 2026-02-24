@@ -169,7 +169,7 @@ fun InterfazApp(modifier: Modifier = Modifier){
                                     "| Lexema: ${token.lexema}\n" +
                                     "| Tipo: ${token.tipo}\n" +
                                     "| Linea: ${token.linea}\n" +
-                                    "| Columna: ${token.columna}\n" +
+                                  /*  "| Columna: ${token.columna}\n" +*/
                                     "================================"
                         }
 
