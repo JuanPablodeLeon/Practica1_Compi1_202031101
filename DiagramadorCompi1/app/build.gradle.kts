@@ -39,58 +39,7 @@ android {
     }
 }
 
-tasks.register<JavaExec>("generateJflex") {
-    description = "Generate JFlex lexer"
-    group = "build"
-
-    val jflexFile = file("src/main/java/com/example/diagramadorcompi1/Analizadores/Lexer.flex")
-    val outputDir = file("src/main/java/com/example/diagramadorcompi1/Analizadores")
-
-    inputs.file(jflexFile)
-    outputs.dir(outputDir)
-
-    mainClass.set("jflex.Main")
-    classpath = configurations.maybeCreate("jflexClasspath")
-    args = listOf("-d", outputDir.path, jflexFile.path)
-
-    doFirst {
-        outputDir.mkdirs()
-    }
-}
-
-tasks.register<JavaExec>("generateCup") {
-    description = "Generate CUP parser"
-    group = "build"
-
-    val cupFile = file("src/main/java/com/example/diagramadorcompi1/Analizadores/Parser.cup")
-    val outputDir = file("src/main/java/com/example/diagramadorcompi1/Analizadores")
-
-    inputs.file(cupFile)
-    outputs.dir(outputDir)
-
-    mainClass.set("java_cup.Main")
-    classpath = configurations["cupClasspath"]
-
-    args = listOf(
-        "-destdir", outputDir.path,
-        "-parser", "Parser",
-        "-symbols", "sym",
-        cupFile.path
-    )
-
-    doFirst {
-        outputDir.mkdirs()
-    }
-}
-
-configurations {
-    create("jflexClasspath")
-    create("cupClasspath")
-}
-
 dependencies {
-    "jflexClasspath"("de.jflex:jflex:1.9.1")
-    "cupClasspath"("com.github.vbmacher:java-cup:11b-20160615")
     compileOnly("com.github.vbmacher:java-cup:11b-20160615")
     runtimeOnly("com.github.vbmacher:java-cup:11b-20160615")
     implementation(libs.androidx.core.ktx)
@@ -112,12 +61,4 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-}
-
-tasks.named("generateJflex") {
-    dependsOn("generateCup")
-}
-
-tasks.named("preBuild") {
-    dependsOn("generateJflex")
 }

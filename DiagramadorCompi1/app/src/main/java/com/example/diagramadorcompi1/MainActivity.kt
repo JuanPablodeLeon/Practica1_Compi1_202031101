@@ -38,7 +38,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.diagramadorcompi1.Analizadores.Lexer
+import com.example.diagramadorcompi1.Analizadores.Parser
+import com.example.diagramadorcompi1.Modelos.TableSymbol
+import com.example.diagramadorcompi1.Modelos.Tree
+import com.example.diagramadorcompi1.Patron.Instruccion
 import com.example.diagramadorcompi1.ui.theme.DiagramadorCompi1Theme
+import java.io.StringReader
+import java.util.LinkedList
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,7 +67,11 @@ class MainActivity : ComponentActivity() {
 fun InterfazApp(modifier: Modifier = Modifier){
 
     var inputText by remember { mutableStateOf(
-        "MOSTRAR 12 < 5"
+        "INICIO\n" +
+                "VAR a = 5\n" +
+                "FIN\n" +
+                "%%%%\n" +
+                "%DEFAULT = 1"
     ) }
 
     var consoleText by remember { mutableStateOf("Consola....\n") }
@@ -140,24 +151,40 @@ fun InterfazApp(modifier: Modifier = Modifier){
                 onClick = {
                     consoleText = "===== EJECUCIÓN =====\n"
                     //Parte donde se agrega la info del analizador en la "Consola"
-                    /*
-                                        try {
-                                            val lexer = Lexer(StringReader(inputText))
-                                            val parser = Parser(lexer)
-                                            val result = parser.parse()
-                                            val ast = Tree(result.value as LinkedList<Instruction>)
-                                            val table = TableSymbol()
 
-                                            for (instruction in ast.instructions) {
-                                                instruction.interpret(ast, table)
-                                            }
+                    try {
+                        val lexer = Lexer(StringReader(inputText))
+                        val parser = Parser(lexer)
+                        val result = parser.parse()
+                        val ast = Tree(result.value as LinkedList<Instruccion>)
+                        val table = TableSymbol()
 
-                                            consoleText += ast.console
+                        for (instruction in ast.instrucciones) {
+                            instruction.interprete(ast, table)
+                        }
 
-                                        } catch (e: Exception) {
-                                            consoleText += "\n--- ERROR ---\n"
-                                            consoleText += "${e.message}\n"
-                                        }*/
+                        consoleText += "\n---- TOKENS ----\n"
+                        for (token in Lexer.listaTokens){
+                            consoleText += "================================\n" +
+                                    "| Lexema: ${token.lexema}\n" +
+                                    "| Tipo: ${token.tipo}\n" +
+                                    "| Linea: ${token.linea}\n" +
+                                    "| Columna: ${token.columna}\n" +
+                                    "================================"
+                        }
+
+                        if(lexer.listaErrorLexico.isNotEmpty()){
+                            consoleText += "\n---- ERROR LEXICO ----\n"
+                            for(error in lexer.listaErrorLexico){
+                                consoleText += "${error.mensaje} en :  línea ${error.linea} | columna ${error.columna} "
+                            }
+                        }
+                        consoleText += ast.console
+
+                    } catch (e: Exception) {
+                        consoleText += "\n--- ERROR SINTACTICO ---\n"
+                        consoleText += "${e.message}\n"
+                    }
                 },
                 modifier = Modifier
                     .weight(1f)

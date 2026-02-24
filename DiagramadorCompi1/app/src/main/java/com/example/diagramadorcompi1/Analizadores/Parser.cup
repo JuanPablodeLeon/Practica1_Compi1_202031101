@@ -1,16 +1,11 @@
 package com.example.diagramadorcompi1.Analizadores;
 
 import java_cup.runtime.Symbol;
-import com.example.test.model.*;
-/* Ir agregando conforme se hacen las estructuras
-import com.example.test.patron.Instruction;
-import com.example.test.instruction.Print;
-import com.example.test.instruction.variable.*;
-import com.example.test.expression.Native;
-import com.example.test.expression.arithmetic.Plus;
-import com.example.test.expression.logic.Or;
-import com.example.test.expression.relational.Greather;
-*/
+import com.example.diagramadorcompi1.Modelos.*;
+import com.example.diagramadorcompi1.Patron.Instruccion;
+import com.example.diagramadorcompi1.Instruccion.Print;
+import com.example.diagramadorcompi1.Instruccion.Variable.*;
+import com.example.diagramadorcompi1.Expression.Native;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -26,3 +21,51 @@ action code
     String console = "";
 
 :}
+
+terminal INICIO, FIN;
+terminal SI, ENTONCES, FINSI;
+terminal MIENTRAS, HACER, FINMIENTRAS;
+terminal MOSTRAR, LEER, VAR;
+terminal ASIGNACION;
+terminal IGUALDAD, DIFERENTE, MENOR_IGUAL_QUE, MAYOR_IGUAL_QUE;
+terminal OR, AND, MENOR_QUE, MAYOR_QUE, NOT;
+terminal LPAREN, RPAREN;
+terminal SUMA, RESTA, MULTIPLICACION, DIVISION;
+terminal ENTEROS, DECIMAL, HEXADECIMAL, IDENTIFICADOR, TEXTO, UMENOS;
+terminal SEPARADOR;
+terminal DEFAULT;
+terminal COLOR_TEXTO_SI, COLOR_SI, FIGURA_SI, LETRAS_SI, LETRAS_SIZE_SI;
+terminal COLOR_TEXTO_MIENTRAS, COLOR_MIENTRAS, FIGURA_MIENTRAS, LETRAS_MIENTRAS, LETRAS_SIZE_MIENTRAS;
+terminal COLOR_TEXTO_BLOQUE, COLOR_BLOQUE, FIGURA_BLOQUE, LETRAS_BLOQUE, LETRAS_SIZE_BLOQUE;
+terminal ECLIPSE, CIRCULO, PARALELOGRAMO, RECTANGULO, ROMBO, RECTANGULO_REDONDEADO;
+terminal ARIAL, TIMES_NEW_ROMAN, COMIC_SANS, VERDANA;
+terminal COMA, SEPARADOR_CONFIG;
+
+nonterminal LinkedList<Instruccion> iniciacion, instrucciones;
+nonterminal Instruccion instruccion, print;
+nonterminal Instruccion inicio, bloque_codigo;
+
+precedence left OR, AND;
+precedence left MAYOR_IGUAL_QUE;
+precedence left MENOR_IGUAL_QUE;
+precedence left SUMA, RESTA;
+precedence left MULTIPLICACION, DIVISION;
+precedence right UMENOS;
+
+start with iniciacion;
+
+iniciacion ::= instrucciones:a {: RESULT = a; :}
+            ;
+
+instrucciones ::= instrucciones:a instruccion:b {: RESULT = a; RESULT.add(b); :}
+                | instruccion:a {: RESULT = new LinkedList<Instruccion>(); RESULT.add(a); :}
+                ;
+
+instruccion ::= print:a {: RESULT = a; :}
+                | inicio:a {: RESULT = a; :}
+                ;
+inicio ::= bloque_codigo:b SEPARADOR:a {: RESULT = b; RESULT = new Native(a, new Type(TypeData.SEPARADOR), aleft, aright);:}
+        ;
+
+bloque_codigo ::= INICIO:a FIN:b {: RESULT = new Native(a, new Type(TypeData.STRING), aleft, aright); RESULT = new Native(b, new Type(TypeData.STRING), aleft, aright);:}
+                ;
