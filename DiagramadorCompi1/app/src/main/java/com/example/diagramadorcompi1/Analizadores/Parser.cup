@@ -43,7 +43,7 @@ terminal COMA, SEPARADOR_CONFIG;
 
 nonterminal LinkedList<Instruccion> iniciacion, instrucciones;
 nonterminal Instruccion instruccion, print;
-nonterminal Instruccion inicio, bloque_codigo;
+nonterminal Instruccion inicio, bloque_codigo, codigo_start;
 nonterminal Instruccion codigo, bloque, estruc_mostrar, estruc_si;
 nonterminal Instruccion estruc_mientras;
 nonterminal Instruccion variable, op_matematica, estruc_leer;
@@ -63,14 +63,16 @@ iniciacion ::= instrucciones:a {: RESULT = a; :}
 instrucciones ::= instrucciones:a instruccion:b {: RESULT = a; RESULT.add(b); :}
                 | instruccion:a {: RESULT = new LinkedList<Instruccion>(); RESULT.add(a); :}
                 ;
-
+//modificar para que me guarde aparte lo de codigo y config para asi dibujarlo
 instruccion ::= print:a {: RESULT = a; :}
                 | inicio:a {: RESULT = a; :}
                 ;
 
-inicio ::= INICIO codigo:a FIN SEPARADOR {: RESULT = a; :}
+inicio ::= INICIO codigo_start:a FIN SEPARADOR {: RESULT = a; :}
         ;
-
+codigo_start ::= codigo_start codigo:a {:RESULT = a;:}
+               | codigo:a {:RESULT = a; :}
+              ;
 codigo ::= bloque:a {: RESULT = a; :}
          | estruc_si:a {: RESULT = a; :}
          | estruc_mientras:a {: RESULT = a; :}
