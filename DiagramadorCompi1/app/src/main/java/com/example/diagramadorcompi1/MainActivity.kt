@@ -121,7 +121,7 @@ fun InterfazApp(modifier: Modifier = Modifier){
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(150.dp),
+                        .height(250.dp),
                     shape = RoundedCornerShape(16.dp),
                     color = Color.Black
                 ) {
@@ -162,7 +162,8 @@ fun InterfazApp(modifier: Modifier = Modifier){
                         for (instruction in ast.instrucciones) {
                             instruction.interprete(ast, table)
                         }
-
+                        //modificar el como se muestra
+                        //probabilidad de que el reporte sea de esta forma
                         consoleText += "\n---- TOKENS ----\n"
                         for (token in Lexer.listaTokens){
                             consoleText += "================================\n" +

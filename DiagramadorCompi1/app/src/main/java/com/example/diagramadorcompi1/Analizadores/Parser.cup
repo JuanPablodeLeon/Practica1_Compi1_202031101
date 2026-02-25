@@ -6,6 +6,8 @@ import com.example.diagramadorcompi1.Patron.Instruccion;
 import com.example.diagramadorcompi1.Instruccion.Print;
 import com.example.diagramadorcompi1.Instruccion.Variable.*;
 import com.example.diagramadorcompi1.Expression.Native;
+import com.example.diagramadorcompi1.Expression.Aritmetica.OperacionMathNoRetornable;
+import com.example.diagramadorcompi1.Expression.Aritmetica.OperacionUMenos;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -45,8 +47,11 @@ nonterminal LinkedList<Instruccion> iniciacion, instrucciones;
 nonterminal Instruccion instruccion, print;
 nonterminal Instruccion inicio, bloque_codigo, codigo_start;
 nonterminal Instruccion codigo, bloque, estruc_mostrar, estruc_si;
-nonterminal Instruccion estruc_mientras;
+nonterminal Instruccion estruc_mientras, valores_variable;
 nonterminal Instruccion variable, op_matematica, estruc_leer;
+nonterminal Instruccion op_math_bloque_1, op_math_bloque_2, op_math_bloque_3;
+nonterminal Instruccion condicion, condicion_compleja, expresion_relacional;
+nonterminal Instruccion expresion_paren;
 
 precedence left OR, AND;
 precedence left MAYOR_IGUAL_QUE;
@@ -83,9 +88,9 @@ bloque ::= variable:a {: RESULT = a; :}
          | estruc_leer:a {: RESULT = a; :}
         ;
 
-variable ::=  VAR IDENTIFICADOR:a ASIGNACION op_matematica:b {: RESULT = new Declaracion((String) a, b, aleft, aright); :}
+variable ::=  VAR IDENTIFICADOR:a ASIGNACION op_math_bloque_1:b {: RESULT = new Declaracion((String) a, b, aleft, aright); :}
             | VAR IDENTIFICADOR:a {: RESULT = new Declaracion((String) a, null, aleft, aright); :}
-            | IDENTIFICADOR:a ASIGNACION op_matematica:b {: RESULT = new Declaracion((String) a, b, aleft, aright); :}
+            | IDENTIFICADOR:a ASIGNACION op_math_bloque_1:b {: RESULT = new Declaracion((String) a, b, aleft, aright); :}
             ;
 
 estruc_mostrar ::= MOSTRAR TEXTO:a {: RESULT = new Native(a,new Type(TypeData.STRING), aleft, aright); :}
@@ -93,9 +98,50 @@ estruc_mostrar ::= MOSTRAR TEXTO:a {: RESULT = new Native(a,new Type(TypeData.ST
 
 estruc_leer ::= LEER IDENTIFICADOR:a {: RESULT = new Native(a,new Type(TypeData.STRING), aleft, aright); :}
              ;
+estruc_si ::= SI condicion:a ENTONCES {: RESULT = a;:}
+           ;
 
-op_matematica ::= IDENTIFICADOR:a {: RESULT = new AccesVariable((String) a, aleft, aright); :}
+estruc_mientras ::= MIENTRAS condicion:a HACER {: RESULT = a;:}
+                 ;
+
+condicion ::= NOT condicion_compleja:a {: RESULT = a; :}
+            | condicion_compleja:a {: RESULT = a; :}
+            ;
+
+condicion_compleja ::= condicion_compleja:a AND expresion_relacional:b {: RESULT = new OperacionMathNoRetornable( a, b, aleft, aright); :}
+                     | condicion_compleja:a OR expresion_relacional:b {: RESULT = new OperacionMathNoRetornable( a, b, aleft, aright); :}
+                     | expresion_relacional:a {: RESULT = a; :}
+                     ;
+
+expresion_relacional ::= expresion_relacional:a IGUALDAD expresion_paren:b {: RESULT = new OperacionMathNoRetornable( a, b, aleft, aright); :}
+                       | expresion_relacional:a DIFERENTE expresion_paren:b {: RESULT = new OperacionMathNoRetornable( a, b, aleft, aright); :}
+                       | expresion_relacional:a MAYOR_IGUAL_QUE expresion_paren:b {: RESULT = new OperacionMathNoRetornable( a, b, aleft, aright); :}
+                       | expresion_relacional:a MENOR_IGUAL_QUE expresion_paren:b {: RESULT = new OperacionMathNoRetornable( a, b, aleft, aright); :}
+                       | expresion_relacional:a MAYOR_QUE expresion_paren:b {: RESULT = new OperacionMathNoRetornable( a, b, aleft, aright); :}
+                       | expresion_relacional:a MENOR_QUE expresion_paren:b {: RESULT = new OperacionMathNoRetornable( a, b, aleft, aright); :}
+                       | expresion_paren:a {: RESULT = a; :}
+                       ;
+
+expresion_paren ::= LPAREN condicion:a RPAREN {: RESULT = a; :}
+                  | valores_variable:a {: RESULT = a; :}
+                  ;
+
+op_math_bloque_1 ::= RESTA op_math_bloque_1:a {: RESULT = new OperacionUMenos(a, aleft, aright); :} %prec UMENOS
+                  | op_math_bloque_1:a SUMA op_math_bloque_2:b {: RESULT = new OperacionMathNoRetornable( a, b, aleft, aright); :}
+                  | op_math_bloque_1:a RESTA op_math_bloque_2:b  {: RESULT = new OperacionMathNoRetornable(a, b, aleft, aright); :}
+                  | op_math_bloque_2:a {: RESULT = a; :}
+                ;
+
+op_math_bloque_2 ::= op_math_bloque_2:a MULTIPLICACION op_math_bloque_3:b {: RESULT = new OperacionMathNoRetornable(a, b, aleft, aright); :}
+                   | op_math_bloque_2:a DIVISION op_math_bloque_3:b {: RESULT = new OperacionMathNoRetornable(a, b, aleft, aright); :}
+                   | op_math_bloque_3:a {: RESULT = a; :}
+                   ;
+
+op_math_bloque_3 ::= LPAREN op_math_bloque_1:a RPAREN {: RESULT = a; :}
+                    | valores_variable:a {: RESULT = a; :}
+                    ;
+
+valores_variable ::= IDENTIFICADOR:a {: RESULT = new AccesVariable((String) a, aleft, aright); :}
                 |DECIMAL:a {: RESULT = new Native(Double.parseDouble(a.toString()), new Type(TypeData.DECIMAL), aleft, aright); :}
                 | ENTEROS:a {: RESULT = new Native(Integer.parseInt(a.toString()), new Type(TypeData.ENTERO), aleft, aright); :}
-                | TEXTO:a {: RESULT = new Native(a,new Type(TypeData.STRING), aleft, aright); :}
                 ;
