@@ -193,7 +193,7 @@ fun InterfazApp(modifier: Modifier = Modifier){
                     .padding(end = 8.dp),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Text("1", fontSize = 18.sp)
+                Text("Reportes", fontSize = 18.sp)
             }
 
             // 🟣 BOTÓN 2 (puede ser limpiar consola)

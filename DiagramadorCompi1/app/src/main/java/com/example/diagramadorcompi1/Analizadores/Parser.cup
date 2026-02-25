@@ -59,6 +59,7 @@ nonterminal LinkedList<Instruccion> configuracion_personalizada;
 nonterminal Instruccion expresion_paren, config_def;
 nonterminal Instruccion nombre_figuras, tipos_letras;
 nonterminal Instruccion tipos_color, color_RGB;
+nonterminal Instruccion operaciones, operaciones_1;
 
 precedence left OR, AND;
 precedence left MAYOR_IGUAL_QUE;
@@ -200,4 +201,10 @@ tipos_color ::= HEXADECIMAL:a {:RESULT = new Native(a, new Type(TypeData.STRING)
 color_RGB ::= operaciones COMA operaciones COMA operaciones
             ;
 
-operaciones ::= RESTA operaciones:a {::}
+operaciones ::= RESTA operaciones:a {: RESULT = new OperacionUMenos(a, aleft, aright); :} %orec UMENOS
+              | operaciones:a SUMA operaciones_1:b {: RESULT = new SUMA(a, b, aleft, aright); :}
+              | operaciones:a RESTA operaciones_1:b {: RESULT = new RESTA(a, b, aleft, aright); :}
+              | operaciones_1:a {: RESULT = a; :}
+              ;
+
+operaciones_1 ::= operaciones_1 MULTIPLICACION
