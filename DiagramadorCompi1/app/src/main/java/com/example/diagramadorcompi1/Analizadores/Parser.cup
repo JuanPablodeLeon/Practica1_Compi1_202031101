@@ -8,6 +8,8 @@ import com.example.diagramadorcompi1.Instruccion.Variable.*;
 import com.example.diagramadorcompi1.Expression.Native;
 import com.example.diagramadorcompi1.Expression.Aritmetica.OperacionMathNoRetornable;
 import com.example.diagramadorcompi1.Expression.Aritmetica.OperacionUMenos;
+import com.example.diagramadorcompi1.Flujos.Estructuira_SI;
+import com.example.diagramadorcompi1.Flujos.Estructura_Mientras;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -25,7 +27,7 @@ action code
 :}
 
 terminal INICIO, FIN;
-terminal SI, ENTONCES, FINSI;
+terminal SI, ENTONCES, FINSI; //posible uso de forma separada el FIN SI o debe de ir junto
 terminal MIENTRAS, HACER, FINMIENTRAS;
 terminal MOSTRAR, LEER, VAR;
 terminal ASIGNACION;
@@ -44,8 +46,10 @@ terminal ARIAL, TIMES_NEW_ROMAN, COMIC_SANS, VERDANA;
 terminal COMA, SEPARADOR_CONFIG;
 
 nonterminal LinkedList<Instruccion> iniciacion, instrucciones;
+nonterminal LinkedList<Instruccion> codigo_start;
+nonterminal LinkedList<Instruccion> inicio;
 nonterminal Instruccion instruccion, print;
-nonterminal Instruccion inicio, bloque_codigo, codigo_start;
+nonterminal Instruccion bloque_codigo;
 nonterminal Instruccion codigo, bloque, estruc_mostrar, estruc_si;
 nonterminal Instruccion estruc_mientras, valores_variable;
 nonterminal Instruccion variable, op_matematica, estruc_leer;
@@ -66,18 +70,24 @@ iniciacion ::= instrucciones:a {: RESULT = a; :}
             ;
 
 instrucciones ::= instrucciones:a instruccion:b {: RESULT = a; RESULT.add(b); :}
+                | instrucciones:a inicio:b {: RESULT  = a; RESULT.addAll(b); :}
                 | instruccion:a {: RESULT = new LinkedList<Instruccion>(); RESULT.add(a); :}
+                | inicio:a {: RESULT = a; :}
                 ;
 //modificar para que me guarde aparte lo de codigo y config para asi dibujarlo
-instruccion ::= print:a {: RESULT = a; :}
-                | inicio:a {: RESULT = a; :}
+instruccion ::= print:a {: RESULT = a; :} //probabilidad de eliminar
                 ;
 
 inicio ::= INICIO codigo_start:a FIN SEPARADOR {: RESULT = a; :}
         ;
-codigo_start ::= codigo_start codigo:a {:RESULT = a;:}
-               | codigo:a {:RESULT = a; :}
+
+codigo_start ::= codigo_start:a codigo:b {: a.add(b);
+                                          RESULT = a; :}
+               | codigo:a {: LinkedList<Instruccion> lista = new LinkedList<Instruccion>();
+                             lista.add(a);
+                             RESULT = lista; :}
               ;
+
 codigo ::= bloque:a {: RESULT = a; :}
          | estruc_si:a {: RESULT = a; :}
          | estruc_mientras:a {: RESULT = a; :}
@@ -93,15 +103,16 @@ variable ::=  VAR IDENTIFICADOR:a ASIGNACION op_math_bloque_1:b {: RESULT = new 
             | IDENTIFICADOR:a ASIGNACION op_math_bloque_1:b {: RESULT = new Declaracion((String) a, b, aleft, aright); :}
             ;
 
-estruc_mostrar ::= MOSTRAR TEXTO:a {: RESULT = new Native(a,new Type(TypeData.STRING), aleft, aright); :}
+estruc_mostrar ::= MOSTRAR TEXTO:a {: RESULT = new Native(a,new Type(TypeData.STRING), aleft, aright); :} //posible modificacion de si admite solo texto o algo mas
                 ;
 
 estruc_leer ::= LEER IDENTIFICADOR:a {: RESULT = new Native(a,new Type(TypeData.STRING), aleft, aright); :}
              ;
-estruc_si ::= SI condicion:a ENTONCES codigo_start FINSI {: RESULT = a;:}
+
+estruc_si ::= SI condicion:a ENTONCES codigo_start:b FINSI {: RESULT = new Estructuira_SI(a, b, aleft, aright); :}
            ;
 
-estruc_mientras ::= MIENTRAS condicion:a HACER {: RESULT = a;:}
+estruc_mientras ::= MIENTRAS condicion:a HACER codigo_start:b FINMIENTRAS {: RESULT = new Estructura_Mientras(a, b, aleft, aright); :}
                  ;
 
 condicion ::= NOT condicion_compleja:a {: RESULT = a; :}
