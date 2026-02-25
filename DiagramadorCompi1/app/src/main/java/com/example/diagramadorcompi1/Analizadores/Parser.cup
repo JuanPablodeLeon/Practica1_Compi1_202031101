@@ -58,6 +58,7 @@ nonterminal Instruccion condicion, condicion_compleja, expresion_relacional;
 nonterminal LinkedList<Instruccion> configuracion_personalizada;
 nonterminal Instruccion expresion_paren, config_def;
 nonterminal Instruccion nombre_figuras, tipos_letras;
+nonterminal Instruccion tipos_color, color_RGB;
 
 precedence left OR, AND;
 precedence left MAYOR_IGUAL_QUE;
@@ -170,6 +171,12 @@ config_def ::= DEFAULT ASIGNACION ENTEROS:a {: RESULT = new Native(Integer.parse
              | LETRAS_MIENTRAS ASIGNACION tipos_letras:a SEPARADOR_CONFIG ENTEROS {: RESULT = a; :}
              | FIGURA_BLOQUE ASIGNACION nombre_figuras:a SEPARADOR_CONFIG ENTEROS {: RESULT = a; :}
              | LETRAS_BLOQUE ASIGNACION tipos_letras:a SEPARADOR_CONFIG ENTEROS {: RESULT = a; :}
+             | COLOR_TEXTO_SI ASIGNACION tipos_color:a SEPARADOR_CONFIG ENTEROS {: RESULT = a; :}
+             | COLOR_SI ASIGNACION tipos_color:a SEPARADOR_CONFIG ENTEROS {: RESULT = a; :}
+             | COLOR_TEXTO_MIENTRAS ASIGNACION tipos_color:a SEPARADOR_CONFIG ENTEROS {: RESULT = a; :}
+             | COLOR_MIENTRAS ASIGNACION tipos_color:a SEPARADOR_CONFIG ENTEROS {: RESULT = a; :}
+             | COLOR_TEXTO_BLOQUE ASIGNACION tipos_color:a SEPARADOR_CONFIG ENTEROS {: RESULT = a; :}
+             | COLOR_BLOQUE ASIGNACION tipos_color:a SEPARADOR_CONFIG ENTEROS {: RESULT = a; :}
             ;
 
 nombre_figuras ::= ECLIPSE:a {: RESULT = new Native(a, new Type(TypeData.FIGURAS), aleft, aright); :}
@@ -185,3 +192,12 @@ tipos_letras ::= ARIAL:a {: RESULT = new Native(a, new Type(TypeData.TIPOGRAFIA)
                | COMIC_SANS:a {: RESULT = new Native(a, new Type(TypeData.TIPOGRAFIA), aleft, aright); :}
                | VERDANA:a {: RESULT = new Native(a, new Type(TypeData.TIPOGRAFIA), aleft, aright); :}
                ;
+
+tipos_color ::= HEXADECIMAL:a {:RESULT = new Native(a, new Type(TypeData.STRING), aleft, aright); :}
+              | color_RGB:a {: RESULT = a; :}
+              ;
+
+color_RGB ::= operaciones COMA operaciones COMA operaciones
+            ;
+
+operaciones ::= RESTA operaciones:a {::}
