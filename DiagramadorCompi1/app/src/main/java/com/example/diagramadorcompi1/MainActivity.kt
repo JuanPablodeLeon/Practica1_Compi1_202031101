@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-//import androidx.benchmark.traceprocessor.Row
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,6 +43,7 @@ import com.example.diagramadorcompi1.Modelos.TableSymbol
 import com.example.diagramadorcompi1.Modelos.Tree
 import com.example.diagramadorcompi1.Patron.Instruccion
 import com.example.diagramadorcompi1.ui.theme.DiagramadorCompi1Theme
+import java_cup.runtime.Symbol
 import java.io.StringReader
 import java.util.LinkedList
 
@@ -155,23 +155,31 @@ fun InterfazApp(modifier: Modifier = Modifier){
                     try {
                         val lexer = Lexer(StringReader(inputText))
                         val parser = Parser(lexer)
-                        val result = parser.parse()
-                        val ast = Tree(result.value as LinkedList<Instruccion>)
-                        val table = TableSymbol()
+                        var result: Symbol? = null
+                        try {
+                            result = parser.parse()
+                        } catch (e : Exception){
 
-                        for (instruction in ast.instrucciones) {
-                            instruction.interprete(ast, table)
                         }
-                        //modificar el como se muestra
+
                         //probabilidad de que el reporte sea de esta forma
-                        consoleText += "\n---- TOKENS ----\n"
-                        for (token in Lexer.listaTokens){
-                            consoleText += "================================\n" +
-                                    "| Lexema: ${token.lexema}\n" +
-                                    "| Tipo: ${token.tipo}\n" +
-                                    "| Linea: ${token.linea}\n" +
-                                  /*  "| Columna: ${token.columna}\n" +*/
-                                    "================================"
+                        if (result != null && lexer.listaErrorLexico.isEmpty() && parser.listErrorSintactico.isEmpty()){
+                            val ast = Tree(result.value as LinkedList<Instruccion>)
+                            val table = TableSymbol()
+
+                            for (instruction in ast.instrucciones) {
+                                instruction.interprete(ast, table)
+                            }
+
+                            consoleText += "\n---- TOKENS ----\n" +
+                                    "================================\n"
+                            for (token in Lexer.listaTokens){
+                                consoleText += "| Lexema: ${token.lexema}\n" +
+                                        "| Tipo: ${token.tipo}\n" +
+                                        "| Linea: ${token.linea}\n" +
+                                        "================================"
+                            }
+                            consoleText += ast.console
                         }
 
                         if(lexer.listaErrorLexico.isNotEmpty()){
@@ -180,11 +188,18 @@ fun InterfazApp(modifier: Modifier = Modifier){
                                 consoleText += "${error.mensaje} en :  línea ${error.linea} | columna ${error.columna} "
                             }
                         }
-                        consoleText += ast.console
+
+                        if(parser.listErrorSintactico.isNotEmpty()){
+                            consoleText += "\n---- ERROR SINTACTICO ----\n"
+                            for(error in parser.listErrorSintactico){
+                                consoleText += "${error.mensaje} en :  línea ${error.linea} | columna ${error.columna} "
+                            }
+                        }
 
                     } catch (e: Exception) {
-                        consoleText += "\n--- ERROR SINTACTICO ---\n"
-                        consoleText += "${e.message}\n"
+                        if (e.message != null && !e.message!!.contains("Couldn't repair")){
+                            consoleText += "\n ---- ERROR ---- \n" + e.message
+                        }
                     }
                 },
                 modifier = Modifier

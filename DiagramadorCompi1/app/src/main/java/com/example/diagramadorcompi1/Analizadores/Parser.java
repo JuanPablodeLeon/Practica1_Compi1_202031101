@@ -448,6 +448,19 @@ public class Parser extends java_cup.runtime.lr_parser {
 
 
     //agregar lista para erroes sintacticos
+    Parser s;
+    Parser(Parser s){this.s = s;}
+
+    public LinkedList<SintaxError> listErrorSintactico = new LinkedList<>();
+
+    public void syntax_error(Symbol s){
+        listErrorSintactico.add(new SintaxError("Error de sintaxis recuperable", "No se esperaba: " +s.value, s.left, s.right));
+    }
+
+    public void unrecovered_syntax_(Symbol s) throws java.lang.Exception{
+        listErrorSintactico.add(new SintaxError("Error de sintaxis no recuperable", "No se esperaba: " +s.value, s.left, s.right));
+    }
+    //throw new Exception("Error sintactico no recuperable en la linea "+ s.left);
 
 
 /** Cup generated class to encapsulate user supplied action code.*/
