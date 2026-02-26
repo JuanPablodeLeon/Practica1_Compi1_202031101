@@ -1,0 +1,10 @@
+#Thu Feb 26 06:25:23 CST 2026
+base.0=/home/juanpa/Documentos/Practica1_Compi1_202031101/DiagramadorCompi1/app/build/intermediates/dex/debugAndroidTest/mergeExtDexDebugAndroidTest/classes.dex
+base.1=/home/juanpa/Documentos/Practica1_Compi1_202031101/DiagramadorCompi1/app/build/intermediates/dex/debugAndroidTest/mergeProjectDexDebugAndroidTest/0/classes.dex
+base.2=/home/juanpa/Documentos/Practica1_Compi1_202031101/DiagramadorCompi1/app/build/intermediates/dex/debugAndroidTest/mergeProjectDexDebugAndroidTest/11/classes.dex
+path.0=classes.dex
+path.1=0/classes.dex
+path.2=11/classes.dex
+renamed.0=classes.dex
+renamed.1=classes2.dex
+renamed.2=classes3.dex
