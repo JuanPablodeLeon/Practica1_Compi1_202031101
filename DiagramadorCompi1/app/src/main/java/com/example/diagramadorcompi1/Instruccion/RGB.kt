@@ -6,7 +6,9 @@ import com.example.diagramadorcompi1.Modelos.Tree
 import com.example.diagramadorcompi1.Modelos.Type
 import com.example.diagramadorcompi1.Modelos.TypeData
 import com.example.diagramadorcompi1.Patron.Instruccion
-
+/*
+* Clase para poder verificar si los valores corresponden a la estructura RGB
+*/
 class RGB(
     private val red : Instruccion,
     private val green : Instruccion,
@@ -20,10 +22,12 @@ class RGB(
 ){
     override fun interprete(tree: Tree, table: TableSymbol): Any? {
 
+        ///verifica que los valores sean validos
         val redValue = red.interprete(tree, table)
         if (redValue is Error)
             return redValue
 
+        //ingresa el valor al arbol ast
         val greenValue = green.interprete(tree, table)
         if (greenValue is Error)
             return greenValue
@@ -34,20 +38,25 @@ class RGB(
 
         var redType = when (red.typeValue.typeData){
             TypeData.ENTERO -> {
+                /*Si el numero es menor a 0 devuelve 0
+                Si el numero es mayor a 255 devuelve 255
+                Si esta dentro del rango da el numero ingresado
+                * */
                 (redValue as Int).coerceIn(0,255)
             }
             TypeData.DECIMAL ->{
                 this.typeValue = Type(TypeData.ENTERO)
-                val conversion : Int = (redValue as Double).toInt()
+                val conversion : Int = (redValue as Double).toInt() //castea el decimal a entero
                 return conversion.coerceIn(0,255)
             }
             else -> {
                 val error : SintaxError =
-                    SintaxError("SINTACTICO", "Suma Invalida", this.linea, this.columna)
+                    SintaxError("SINTACTICO", "Color Rojo Invalido", this.linea, this.columna)
                 return  error
             }
         }
 
+        //eliminar var greenType = para prueba
         var greenType = when (green.typeValue.typeData){
             TypeData.ENTERO -> {
                 (greenValue as Int).coerceIn(0,255)
@@ -59,7 +68,7 @@ class RGB(
             }
             else -> {
                 val error : SintaxError =
-                    SintaxError("SINTACTICO", "Suma Invalida", this.linea, this.columna)
+                    SintaxError("SINTACTICO", "Color Verde Invalido", this.linea, this.columna)
                 return  error
             }
         }
@@ -74,11 +83,11 @@ class RGB(
             }
             else -> {
                 val error : SintaxError =
-                    SintaxError("SINTACTICO", "Suma Invalida", this.linea, this.columna)
+                    SintaxError("SINTACTICO", "Color Azul Invalido", this.linea, this.columna)
                 return  error
             }
         }
-        this.typeValue = Type(TypeData.RGB)
-        return Triple(red, green, blue)
+        this.typeValue = Type(TypeData.RGB) //redefine el tipo de datos de los objetos ingresados
+        return Triple(red, green, blue) //devuele los 3 objetos recibidos
     }
 }

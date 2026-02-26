@@ -5,6 +5,7 @@ import com.example.diagramadorcompi1.Modelos.Tree
 import com.example.diagramadorcompi1.Modelos.Type
 import com.example.diagramadorcompi1.Patron.Instruccion
 
+//Para poder almacenar los nombres de los identificadores y valores numericos
 class Native (
     val value: Any?,
     type: Type,
@@ -16,6 +17,6 @@ class Native (
     columna
 ){
     override fun interprete(tree: Tree, table: TableSymbol): Any? {
-        return value
+        return value//unicamente devuelve el valor
     }
 }

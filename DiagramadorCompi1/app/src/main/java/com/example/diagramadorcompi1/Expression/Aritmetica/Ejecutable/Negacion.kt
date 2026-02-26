@@ -7,6 +7,7 @@ import com.example.diagramadorcompi1.Modelos.Type
 import com.example.diagramadorcompi1.Modelos.TypeData
 import com.example.diagramadorcompi1.Patron.Instruccion
 
+//en caso de tener un valor/expresion con estructura negativa se devuelve negativa
 class Negacion (
     private val unique : Instruccion,
     linea : Int,
@@ -24,6 +25,7 @@ class Negacion (
 
         val uniqueType = unique.typeValue.typeData
 
+        //devuelve el valor negativo
         when (uniqueType){
             TypeData.ENTERO ->{
                 this.typeValue = Type(TypeData.ENTERO)
@@ -35,7 +37,7 @@ class Negacion (
             }
             else -> {
                 val error : SintaxError =
-                    SintaxError("SINTACTICO", "Tipo de Valor no Invalida", this.linea, this.columna)
+                    SintaxError("SINTACTICO", "Tipo de Valor no Invalido", this.linea, this.columna)
                 return  error
             }
         }

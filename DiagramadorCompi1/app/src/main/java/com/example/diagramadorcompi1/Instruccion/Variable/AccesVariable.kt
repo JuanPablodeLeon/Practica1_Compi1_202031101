@@ -17,11 +17,11 @@ class AccesVariable(
     columna
 ) {
     override fun interprete(tree: Tree, table: TableSymbol): Any? {
-        val value = table.gertVariable(name)
-        if (value == null){
+        val value = table.gertVariable(name)// obtiene el nombre del identificador
+        if (value == null){//si es null significa que aun no fue declarada
             return SintaxError("Semantico", "Variable no encontrada", linea, columna)
         }
-        this.typeValue = value.typeData!!
+        this.typeValue = value.typeData!!//le remueve el puntero null
         return value.value
     }
 }

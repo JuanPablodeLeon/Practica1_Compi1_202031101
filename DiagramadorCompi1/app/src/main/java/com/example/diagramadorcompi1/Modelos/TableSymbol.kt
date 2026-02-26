@@ -3,13 +3,14 @@ package com.example.diagramadorcompi1.Modelos
 class TableSymbol (
     var tablaPrevia: TableSymbol?= null
 ){
+    //uso de hash para facilidad al encontrar un identificador
     private val tablaActual: MutableMap<String, Symbol> = HashMap()
     var nombre: String = ""
 
     fun setVariable(symbol: Symbol): Boolean{
         val id = symbol.id.lowercase()
 
-        if (!tablaActual.containsKey(id)){
+        if (!tablaActual.containsKey(id)){ //si el identificaro existe no se agregaba a la tabla de simbolos
             tablaActual[id] = symbol
             return true
         }

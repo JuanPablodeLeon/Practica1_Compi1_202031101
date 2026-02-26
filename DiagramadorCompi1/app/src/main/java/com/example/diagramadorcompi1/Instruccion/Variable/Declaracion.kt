@@ -21,9 +21,10 @@ class Declaracion(
     override fun interprete(tree: Tree, table: TableSymbol): Any? {
         if (value == null){
             val type = Type(TypeData.VOID)
-            val newVal : Any? = null
+            val newVal : Any? = null //Le asigna el valor null de inicio
+            //Prueba establecer la variable en la tabla de simbolos
             if (table.setVariable(Symbol(this.name, newVal, type))){
-                return null
+                return null //lo regresa a null para que cuando llegue a el esto mas bajo pueda ser modificado
             }
         }
 

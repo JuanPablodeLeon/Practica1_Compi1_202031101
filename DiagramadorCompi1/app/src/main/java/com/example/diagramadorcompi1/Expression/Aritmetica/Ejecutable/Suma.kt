@@ -26,18 +26,19 @@ class Suma (
         if (rightValue is Error)
             return rightValue
 
+        //se obtiene el tipo de las instrucciones para poder verificar si se castea o unicamente realiza la accion
         var leftType = left.typeValue.typeData
         var rightType = right.typeValue.typeData
 
         when (leftType){
             TypeData.ENTERO -> {
                 when (rightType){
-                    TypeData.ENTERO -> {
+                    TypeData.ENTERO -> {//en caso de ser el valor izquierdo y derecho enteros unicamente se suman y se devuelve
                         this.typeValue = Type(TypeData.ENTERO)
                         return leftValue as Int + rightValue as Int
                     }
 
-                    TypeData.DECIMAL ->{
+                    TypeData.DECIMAL ->{//si el segundo elemento es decimal se castea el primero a decimal y se devuelve
                         this.typeValue = Type(TypeData.DECIMAL)
                         if (leftValue is Number && rightValue is Number){
                             return  (leftValue as Number).toDouble() + (rightValue as Number).toDouble()
@@ -53,13 +54,13 @@ class Suma (
                 }
             }
 
-            TypeData.DECIMAL ->{
+            TypeData.DECIMAL ->{//si el primero es decimal
                 when (rightType){
-                    TypeData.ENTERO ->{
-                        this.typeValue = Type(TypeData.DECIMAL)
+                    TypeData.ENTERO ->{//si el segundo es decimal se casean para manejar un mismo valor
+                        this.typeValue = Type(TypeData.DECIMAL)//cambia el valor a tipo decimal
                         return (leftValue as Double) + (rightValue as Double)
                     }
-                    TypeData.DECIMAL ->{
+                    TypeData.DECIMAL ->{ //ambos decimales unicamente suma
                         this.typeValue = Type(TypeData.DECIMAL)
                         return  leftValue as Double + rightValue as Double
                     }

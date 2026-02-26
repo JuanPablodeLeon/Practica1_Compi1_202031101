@@ -10,8 +10,8 @@ import com.example.diagramadorcompi1.Patron.Instruccion
 import java.util.LinkedList
 
 class Estructuira_SI (
-     private val unique: Instruccion,
-     private val instrucciones :LinkedList<Instruccion>?,
+     private val unique: Instruccion, //recibe una instrucion para condicional
+     private val instrucciones :LinkedList<Instruccion>?, //enlista mas instrucciones para poder almacenarlas dentro de SI
     linea : Int,
     columna : Int
 ) : Instruccion(
@@ -20,6 +20,8 @@ class Estructuira_SI (
     columna
 ){
     override fun interprete(tree: Tree, table: TableSymbol): Any? {
+        //Si unique llega a ser una estructura de condicion lo almacena para el uso de reporte
+        //en caso de no ser una condicion se agrega ¿?
         val condicion = if(unique is OperacionMathNoRetornable) unique.toTexto() else "¿?"
         tree.agregarControl(Control("SI",linea,condicion))
 
@@ -27,10 +29,9 @@ class Estructuira_SI (
 
         if (uniqueVal == true)
             if (instrucciones != null)
-                for(instruc in instrucciones)
+                for(instruc in instrucciones) //itera todas las instrucciones almacenadas para guardaras en el ast y ser usadas posteriormente
                     instruc.interprete(tree, table)
 
-
-        return null
+        return null //devuelve null para no tener confusion con las condicionales
     }
 }

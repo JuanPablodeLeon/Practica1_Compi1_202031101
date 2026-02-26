@@ -20,7 +20,7 @@ class Print(
         if (value is Exception){
             return value
         }
-        tree.print(value.toString())
+        tree.print(value.toString()) //agrega como String el objeto ingresado
         return null
     }
 }

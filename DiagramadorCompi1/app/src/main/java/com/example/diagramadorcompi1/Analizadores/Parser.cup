@@ -42,7 +42,7 @@ action code
     String console = "";
 
 :}
-
+//palabras reservadas definidas en Lexer.jflex
 terminal INICIO, FIN;
 terminal SI, ENTONCES, FINSI;
 terminal MIENTRAS, HACER, FINMIENTRAS;
@@ -63,6 +63,7 @@ terminal ECLIPSE, CIRCULO, PARALELOGRAMO, RECTANGULO, ROMBO, RECTANGULO_REDONDEA
 terminal ARIAL, TIMES_NEW_ROMAN, COMIC_SANS, VERDANA;
 terminal COMA, SEPARADOR_CONFIG;
 
+//elementos no terminales que no pertenecen al Lexer.jflex
 nonterminal LinkedList<Instruccion> iniciacion, instrucciones;
 nonterminal LinkedList<Instruccion> codigo_start;
 nonterminal LinkedList<Instruccion> inicio;
@@ -80,6 +81,7 @@ nonterminal Instruccion tipos_color, color_RGB;
 nonterminal Instruccion operaciones, operaciones_1, operaciones_2;
 nonterminal Instruccion numericos, estruc_fin_si, estruc_fin_mientras;
 
+//definicion de precedencia para operaciones aritmeticas, logicas y relacionales
 precedence left OR, AND;
 precedence left MAYOR_IGUAL_QUE;
 precedence left MENOR_IGUAL_QUE;
@@ -92,70 +94,85 @@ start with iniciacion;
 iniciacion ::= instrucciones:a {: RESULT = a; :}
             ;
 
+
 instrucciones ::= instrucciones:a instruccion:b {: RESULT = a; RESULT.add(b); :}
                 | instrucciones:a inicio:b {: RESULT  = a; RESULT.addAll(b); :}
                 | instruccion:a {: RESULT = new LinkedList<Instruccion>(); RESULT.add(a); :}
                 | inicio:a {: RESULT = a; :}
                 ;
-//modificar para que me guarde aparte lo de codigo y config para asi dibujarlo
-instruccion ::= print:a {: RESULT = a; :} //probabilidad de eliminar
+
+instruccion ::= print:a {: RESULT = a; :} //Usar para debugear informacion
                 ;
 
+//adimite unicamente la estructura INICIO "codigo" FIN %%%% "configuraciones para graficacion"
 inicio ::= INICIO codigo_start:a FIN SEPARADOR configuracion_personalizada:b {: RESULT = a; :}
         ;
 
 codigo_start ::= codigo_start:a codigo:b {: a.add(b);
-                                          RESULT = a; :}
+                                          RESULT = a; :} //anida la lista nueva con la inicial
+                                          //crea lista nueva para poder guardar/repetir los bloques de codigo
                | codigo:a {: LinkedList<Instruccion> lista = new LinkedList<Instruccion>();
                              lista.add(a);
-                             RESULT = lista; :}
+                             RESULT = lista; :} //devuelve la nueva lista
               ;
 
+//puede admitir un bloque de codigo, la estructura SI o MIENTRAS al inicio y repetirlo en cualquierm momento
 codigo ::= bloque:a {: RESULT = a; :}
          | estruc_si:a {: RESULT = a; :}
          | estruc_mientras:a {: RESULT = a; :}
         ;
 
+//bloque esta consituido por las variables, MOSTRAR y LEER
 bloque ::= variable:a {: RESULT = a; :}
          | estruc_mostrar:a {: RESULT = a; :}
          | estruc_leer:a {: RESULT = a; :}
         ;
 
+//variable admite iniciar por VAR o directamente por el nombre
+//sino tiene VAR al inicio debe de asignar un valor/operacion
 variable ::=  VAR IDENTIFICADOR:a ASIGNACION op_math_bloque_1:b {: RESULT = new Declaracion((String) a, b, aleft, aright); :}
             | VAR IDENTIFICADOR:a {: RESULT = new Declaracion((String) a, null, aleft, aright); :}
             | IDENTIFICADOR:a ASIGNACION op_math_bloque_1:b {: RESULT = new Declaracion((String) a, b, aleft, aright); :}
             ;
 
+//admite texto dentro de comillas o el nombre de una variable
 estruc_mostrar ::= MOSTRAR TEXTO:a {: RESULT = new Native(a,new Type(TypeData.STRING), aleft, aright); :}
                  | MOSTRAR IDENTIFICADOR:a {: RESULT = new AccesVariable((String) a, aleft, aright); :}
                 ;
 
+//admite unicament el nombre de una variable
 estruc_leer ::= LEER IDENTIFICADOR:a {: RESULT = new Native(a,new Type(TypeData.STRING), aleft, aright); :}
              ;
 
+//esta constituida por SI "una condicion logica o relacional" ENTONCES "bloque de codigo cualquiera" FINSI/FIN SI
 estruc_si ::= SI condicion:a ENTONCES codigo_start:b estruc_fin_si {: RESULT = new Estructuira_SI(a, b, aleft, aright); :}
            ;
-//quitar
+
+//admite terminal el bloque con las palabras FINSI o FIN SI
 estruc_fin_si ::= FINSI
                 | FIN SI
                 ;
-//quitar
+esta constituida por MIENRTAS "una condicion logica o relacional" HACER "bloque de codigo cualquiera" FINMIENTRAS/FIN MIENTRAS
 estruc_mientras ::= MIENTRAS condicion:a HACER codigo_start:b estruc_fin_mientras {: RESULT = new Estructura_Mientras(a, b, aleft, aright); :}
                  ;
 
+//admite terminal el bloque con las palabras FINMIENTRAS o FIN MIENTRAS
 estruc_fin_mientras ::= FINMIENTRAS
                 | FIN MIENTRAS
                 ;
 
+//admite tener el simbolo ! al inicio de una condicion o usar la condicion con o sin parentesis
 condicion ::= NOT condicion_compleja:a {: RESULT = a; :}
             | condicion_compleja:a {: RESULT = a; :}
             ;
 
+//en mejor jerarquia se encuentra && y ||
 condicion_compleja ::= condicion_compleja:a AND expresion_relacional:b {: RESULT = new OperacionMathNoRetornable( a, b,"&&", aleft, aright); :}
                      | condicion_compleja:a OR expresion_relacional:b {: RESULT = new OperacionMathNoRetornable( a, b, "||", aleft, aright); :}
                      | expresion_relacional:a {: RESULT = a; :}
                      ;
 
+se encuentran todos en misma jerarquia
 expresion_relacional ::= expresion_relacional:a IGUALDAD expresion_paren:b {: RESULT = new OperacionMathNoRetornable( a, b,"==", aleft, aright); :}
                        | expresion_relacional:a DIFERENTE expresion_paren:b {: RESULT = new OperacionMathNoRetornable( a, b, "!=", aleft, aright); :}
                        | expresion_relacional:a MAYOR_IGUAL_QUE expresion_paren:b {: RESULT = new OperacionMathNoRetornable( a, b, ">=", aleft, aright); :}
@@ -165,34 +182,43 @@ expresion_relacional ::= expresion_relacional:a IGUALDAD expresion_paren:b {: RE
                        | expresion_paren:a {: RESULT = a; :}
                        ;
 
+//en caso de obtener parentesis regresa desde la negacion
 expresion_paren ::= LPAREN condicion:a RPAREN {: RESULT = a; :}
-                  | valores_variable:a {: RESULT = a; :}
+                  | valores_variable:a {: RESULT = a; :} //sino es otra operacion admite nombre de id o numeros
                   ;
 
-op_math_bloque_1 ::= RESTA op_math_bloque_1:a {: RESULT = new Negacion(a, aleft, aright); :} %prec UMENOS
+//realiza operaciones aritmeticas teniendo como prioridad cualquier operacion negativa
+op_math_bloque_1 ::= RESTA op_math_bloque_1:a {: RESULT = new Negacion(a, aleft, aright); :} %prec UMENOS /* establece UMENOS como prioridad*/
+                    /*suma y resta tienen menor prioridad*/
                   | op_math_bloque_1:a SUMA op_math_bloque_2:b {: RESULT = new OperacionMathNoRetornable( a, b, "+", aleft, aright); :}
                   | op_math_bloque_1:a RESTA op_math_bloque_2:b  {: RESULT = new OperacionMathNoRetornable(a, b, "-", aleft, aright); :}
                   | op_math_bloque_2:a {: RESULT = a; :}
                 ;
 
+//segundos en jerarquia esta la multiplicacion y division
 op_math_bloque_2 ::= op_math_bloque_2:a MULTIPLICACION op_math_bloque_3:b {: RESULT = new OperacionMathNoRetornable(a, b, "*", aleft, aright); :}
                    | op_math_bloque_2:a DIVISION op_math_bloque_3:b {: RESULT = new OperacionMathNoRetornable(a, b, "/", aleft, aright); :}
                    | op_math_bloque_3:a {: RESULT = a; :}
                    ;
-
+//el primero en prioridad informacion dentro del parenesis
 op_math_bloque_3 ::= LPAREN op_math_bloque_1:a RPAREN {: RESULT = a; :}
                     | valores_variable:a {: RESULT = a; :}
                     ;
 
+//busca si el nombre del idenficador ya se encuentra en el ast
+//si se encuentra ingresado almacena si el elemento es un numero o el nombre del id
 valores_variable ::= IDENTIFICADOR:a {: RESULT = new AccesVariable((String) a, aleft, aright); :}
                 |DECIMAL:a {: RESULT = new Native(Double.parseDouble(a.toString()), new Type(TypeData.DECIMAL), aleft, aright); :}
                 | ENTEROS:a {: RESULT = new Native(Integer.parseInt(a.toString()), new Type(TypeData.ENTERO), aleft, aright); :}
-                | DEFINICION_ID:a {: RESULT = new Native(a,new Type(TypeData.STRING), aleft, aright); :}
+                | DEFINICION_ID:a {: RESULT = new Native(a,new Type(TypeData.STRING), aleft, aright); :} /*guarda unicamente el nombre del id*/
                 ;
+
+//recursividad para poder agregar varias configuraciones y permitiendo como minimo una
 configuracion_personalizada ::= configuracion_personalizada:a config_def:b {: RESULT = a; RESULT.add(b); :}
                               | config_def:a {: RESULT = new LinkedList<Instruccion>(); RESULT.add(a); :}
                               ;
 
+//todas las configuraciones tienen la misma prioridad
 config_def ::= DEFAULT ASIGNACION ENTEROS:a {: RESULT = new Native(Integer.parseInt(a.toString()), new Type(TypeData.ENTERO), aleft, aright); :}
              | FIGURA_SI ASIGNACION nombre_figuras:a SEPARADOR_CONFIG ENTEROS {: RESULT = a; :}
              | LETRAS_SI ASIGNACION tipos_letras:a SEPARADOR_CONFIG ENTEROS {: RESULT = a; :}
@@ -211,6 +237,7 @@ config_def ::= DEFAULT ASIGNACION ENTEROS:a {: RESULT = new Native(Integer.parse
              | LETRAS_SIZE_BLOQUE ASIGNACION numericos:a SEPARADOR_CONFIG ENTEROS {: RESULT = a; :}
             ;
 
+//el nombre de las figuras disponibles
 nombre_figuras ::= ECLIPSE:a {: RESULT = new Native(a, new Type(TypeData.FIGURAS), aleft, aright); :}
                  | CIRCULO:a {: RESULT = new Native(a, new Type(TypeData.FIGURAS), aleft, aright); :}
                  | PARALELOGRAMO:a {: RESULT = new Native(a, new Type(TypeData.FIGURAS), aleft, aright); :}
@@ -219,19 +246,24 @@ nombre_figuras ::= ECLIPSE:a {: RESULT = new Native(a, new Type(TypeData.FIGURAS
                  | RECTANGULO_REDONDEADO:a {: RESULT = new Native(a, new Type(TypeData.FIGURAS), aleft, aright); :}
                  ;
 
+//el tipo de letras para cualquier texto
 tipos_letras ::= ARIAL:a {: RESULT = new Native(a, new Type(TypeData.TIPOGRAFIA), aleft, aright); :}
                | TIMES_NEW_ROMAN:a {: RESULT = new Native(a, new Type(TypeData.TIPOGRAFIA), aleft, aright); :}
                | COMIC_SANS:a {: RESULT = new Native(a, new Type(TypeData.TIPOGRAFIA), aleft, aright); :}
                | VERDANA:a {: RESULT = new Native(a, new Type(TypeData.TIPOGRAFIA), aleft, aright); :}
                ;
 
+//formas del color admitidas por codigo hexadecimal HA2F6B8 o un codigo RGB
 tipos_color ::= HEXADECIMAL:a {:RESULT = new Native(a, new Type(TypeData.STRING), aleft, aright); :}
               | color_RGB:a {: RESULT = a; :}
               ;
 
+//reconoce unicamente valores 0 => x =< 255 separados por comas
 color_RGB ::= operaciones:a COMA operaciones:b COMA operaciones:c {: RESULT = new RGB(a, b, c, aleft, aright); :}
             ;
 
+//obtiene una operacion aritmetica y devuelve el resultado
+//unicamente admite numeros
 operaciones ::= RESTA operaciones:a {: RESULT = new Negacion(a, aleft, aright); :} %prec UMENOS
               | operaciones:a SUMA operaciones_1:b {: RESULT = new Suma(a, b, aleft, aright); :}
               | operaciones:a RESTA operaciones_1:b {: RESULT = new Resta(a, b, aleft, aright); :}
@@ -246,7 +278,7 @@ operaciones_1 ::= operaciones_1:a MULTIPLICACION operaciones_2:b {: RESULT = new
 operaciones_2 ::= LPAREN operaciones:a RPAREN {: RESULT = a; :}
                 | numericos:a {: RESULT = a; :}
                 ;
-
+//se colocan al final para evitar conflicto con los demas estados
 numericos ::= DECIMAL:a {: RESULT = new Native(Double.parseDouble(a.toString()), new Type(TypeData.DECIMAL), aleft, aright); :}
             | ENTEROS:a {: RESULT = new Native(Integer.parseInt(a.toString()), new Type(TypeData.ENTERO), aleft, aright); :}
             ;
