@@ -29,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.traceEventEnd
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -67,21 +68,45 @@ class MainActivity : ComponentActivity() {
 fun InterfazApp(modifier: Modifier = Modifier){
 
     var inputText by remember { mutableStateOf(
-        "INICIO\n" +
-                "VAR a = 5\n" +
+       /* "INICIO\n" +
+                "VAR a = 5 + 8 * (12 - 1) / 3\n" +
                 "FIN\n" +
                 "%%%%\n" +
-                "%DEFAULT = 1"
+                "%DEFAULT = 1"*/
+        """
+            INICIO
+            VAR a = 10
+            VAR b = 20
+            SI (a < b) ENTONCES
+            MOSTRAR "a es menor que b"
+            FINSI
+            MIENTRAS (a < 15) HACER
+            a = a + 1
+            MOSTRAR a
+            FINMIENTRAS
+            MOSTRAR "Fin del programa"
+            FIN
+            %%%%
+            %DEFAULT=1
+            %COLOR_TEXTO_SI=12,45-5,1|1
+            %FIGURA_MIENTRAS=CIRCULO|1
+            %DEFAULT=3
+        """.trimIndent()
     ) }
 
     var consoleText by remember { mutableStateOf("Consola....\n") }
 
     Column(
-        modifier = modifier.fillMaxSize().background(Color.Black).padding(16.dp)
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.Black)
+            .padding(16.dp)
     ) {
         //Titulo
         Surface(
-            modifier = Modifier.fillMaxWidth().height(40.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(40.dp),
             shape = RoundedCornerShape(24.dp),
             color = Color.DarkGray
         ) {
@@ -97,7 +122,9 @@ fun InterfazApp(modifier: Modifier = Modifier){
         Spacer(modifier = Modifier.height(16.dp))
 
         Surface(
-            modifier = Modifier.fillMaxWidth().weight(1f),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
             shape = RoundedCornerShape(20.dp),
             color = Color(0xFF121212),
             shadowElevation = 8.dp
@@ -116,8 +143,7 @@ fun InterfazApp(modifier: Modifier = Modifier){
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                //Consola para debug
-                //Cambiarla por reportes al finalizar lo semantico
+                //Lugar donde muestra los reportes del lenguaje ingresado
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -146,12 +172,10 @@ fun InterfazApp(modifier: Modifier = Modifier){
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
 
-            // Boton Verificar Estructura
+            // Boton para mostrar los reportes con y sin errores
             Button(
                 onClick = {
-                    consoleText = "===== EJECUCIÓN =====\n"
-                    //Parte donde se agrega la info del analizador en la "Consola"
-
+                    consoleText = "++++++++++++++++++++++++++++\n===== LISTADO REPORTES =====\n++++++++++++++++++++++++++++\n\n"
                     try {
                         val lexer = Lexer(StringReader(inputText))
                         val parser = Parser(lexer)
@@ -171,28 +195,38 @@ fun InterfazApp(modifier: Modifier = Modifier){
                                 instruction.interprete(ast, table)
                             }
 
-                            consoleText += "\n---- TOKENS ----\n" +
-                                    "================================\n"
-                            for (token in Lexer.listaTokens){
-                                consoleText += "| Lexema: ${token.lexema}\n" +
-                                        "| Tipo: ${token.tipo}\n" +
-                                        "| Linea: ${token.linea}\n" +
-                                        "================================"
+                            consoleText += "-- REPORTE OPERADORES MATEMATICOS --\n"
+
+                            if (ast.reporteAritmeticos.isEmpty()){
+                                consoleText += "Sin operaciones aritmeticas"
+                            } else{
+                                for(report in ast.reporteAritmeticos){
+                                    consoleText += "\n| Operador : ${report.operador} \n| Linea : ${report.linea}\n| Columna : ${report.columna}\n| Ocurrencia : ${report.ocurrencia}\n=================================\n"
+                                }
                             }
-                            consoleText += ast.console
+
+                            consoleText += "-- REPORTE ESTRUCTURAS DE CONTROL --\n"
+
+                            if (ast.reporteControl.isEmpty()){
+                                consoleText += "Sin estructuras de Control"
+                            } else{
+                                for(report in ast.reporteControl){
+                                    consoleText += "\n| Objeto : ${report.objeto} \n| Linea : ${report.linea}\n| Condicion : ${report.condicion}\n=================================\n"
+                                }
+                            }
                         }
 
                         if(lexer.listaErrorLexico.isNotEmpty()){
                             consoleText += "\n---- ERROR LEXICO ----\n"
                             for(error in lexer.listaErrorLexico){
-                                consoleText += "${error.mensaje} en :  línea ${error.linea} | columna ${error.columna} "
+                                consoleText += "${error.mensaje} en :  línea ${error.linea} | columna ${error.columna} \n"
                             }
                         }
 
                         if(parser.listErrorSintactico.isNotEmpty()){
                             consoleText += "\n---- ERROR SINTACTICO ----\n"
                             for(error in parser.listErrorSintactico){
-                                consoleText += "${error.mensaje} en :  línea ${error.linea} | columna ${error.columna} "
+                                consoleText += "${error.mensaje} en :  línea ${error.linea} | columna ${error.columna} \n"
                             }
                         }
 
@@ -208,13 +242,71 @@ fun InterfazApp(modifier: Modifier = Modifier){
                     .padding(end = 8.dp),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Text("Reportes", fontSize = 18.sp)
+                Text("Reportes", fontSize = 14.sp)
             }
+            //boton para mostrar unicamente los tokens ingresados
+            Button(
+                onClick = {
+                    consoleText = "++++++++++++++++++++++++++\n===== LISTADO TOKENS =====\n++++++++++++++++++++++++++\n\n"
+                    try {
+                        val lexer = Lexer(StringReader(inputText))
+                        val parser = Parser(lexer)
+                        var result: Symbol? = null
+                        try {
+                            result = parser.parse()
+                        } catch (e : Exception){
 
+                        }
+
+                        if (result != null && lexer.listaErrorLexico.isEmpty() && parser.listErrorSintactico.isEmpty()){
+                            val ast = Tree(result.value as LinkedList<Instruccion>)
+                            val table = TableSymbol()
+
+                            for (instruction in ast.instrucciones) {
+                                instruction.interprete(ast, table)
+                            }
+
+                            consoleText += "---- TOKENS ----\n" +
+                                    "============================="
+
+                            for (token in Lexer.listaTokens){
+                                consoleText += "\n| Lexema: ${token.lexema}\n" +
+                                        "| Tipo: ${token.tipo}\n" +
+                                        "| Linea: ${token.linea}\n" +
+                                        "=============================="
+                            }
+                        }
+                        if(lexer.listaErrorLexico.isNotEmpty()){
+                            consoleText += "\n---- ERROR LEXICO ----\n"
+                            for(error in lexer.listaErrorLexico){
+                                consoleText += "${error.mensaje} en :  línea ${error.linea} | columna ${error.columna} \n"
+                            }
+                        }
+
+                        if(parser.listErrorSintactico.isNotEmpty()){
+                            consoleText += "\n---- ERROR SINTACTICO ----\n"
+                            for(error in parser.listErrorSintactico){
+                                consoleText += "${error.mensaje} en :  línea ${error.linea} | columna ${error.columna} \n"
+                            }
+                        }
+
+                    } catch (e: Exception) {
+                        if (e.message != null && !e.message!!.contains("Couldn't repair")){
+                            consoleText += "\n ---- ERROR ---- \n" + e.message
+                        }
+                    }
+                },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(55.dp)
+                    .padding(start = 8.dp),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Text("Tokens", fontSize = 14.sp)
+            }
             // Boton para Eliminar el texto de la Consola y de donde Lee el pseudocodigo
             Button(
                 onClick = {
-                    consoleText = "Consola limpia...\n"
                     inputText = " "
                 },
                 modifier = Modifier
@@ -223,7 +315,7 @@ fun InterfazApp(modifier: Modifier = Modifier){
                     .padding(start = 8.dp),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Text("Limpiar", fontSize = 18.sp)
+                Text("Limpiar", fontSize = 14.sp)
             }
         }
     }

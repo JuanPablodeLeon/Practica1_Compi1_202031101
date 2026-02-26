@@ -33,6 +33,7 @@ import com.example.diagramadorcompi1.Modelos.Token;
 
 /***** DEFINICIONES *******/
 NUMEROS = [0-9]+
+DEFINICION_ID = [a-zA-Z0-9_]+
 LETRAS = [a-zA-Z]+
 DECIMAL = {NUMEROS}"."{NUMEROS}
 IDENTIFICADOR = ({LETRAS}|"_")+({LETRAS}|{NUMEROS}|"_")*
@@ -195,6 +196,9 @@ SEPARADOR_CONFIG = "|"
 
 /***** Identificador *****/
 <YYINITIAL> {IDENTIFICADOR} { agregarToken(yytext(), "IDENTIFICADOR"); return new Symbol(sym.IDENTIFICADOR, yyline, yycolumn, yytext());}
+
+/***** Definicion para Guardar Identificador *****/
+<YYINITIAL> {DEFINICION_ID} { agregarToken(yytext(), "DEFINICION_ID"); return new Symbol(sym.DEFINICION_ID, yyline, yycolumn, yytext());}
 
 /**** Error Lexico ****/
 <YYINITIAL> . { agregarToken(yytext(), "ERROR"); listaErrorLexico.add(new SintaxError("LEXICO", "Simbolo: "+ yytext()+" no existente en el lenguaje", yyline, yycolumn));}

@@ -8,67 +8,68 @@ package com.example.diagramadorcompi1.Analizadores;
 /** CUP generated class containing symbol constants. */
 public class sym {
   /* terminals */
-  public static final int COLOR_TEXTO_BLOQUE = 47;
+  public static final int COLOR_TEXTO_BLOQUE = 48;
   public static final int SI = 4;
   public static final int MOSTRAR = 10;
-  public static final int FIGURA_BLOQUE = 49;
-  public static final int SEPARADOR_CONFIG = 63;
+  public static final int FIGURA_BLOQUE = 50;
+  public static final int SEPARADOR_CONFIG = 64;
   public static final int DIFERENTE = 15;
   public static final int RESTA = 26;
   public static final int LPAREN = 23;
+  public static final int DEFINICION_ID = 35;
   public static final int ENTONCES = 5;
-  public static final int RECTANGULO_REDONDEADO = 57;
-  public static final int SEPARADOR = 35;
+  public static final int RECTANGULO_REDONDEADO = 58;
+  public static final int SEPARADOR = 36;
   public static final int FIN = 3;
   public static final int RPAREN = 24;
-  public static final int LETRAS_SIZE_MIENTRAS = 46;
+  public static final int LETRAS_SIZE_MIENTRAS = 47;
   public static final int IDENTIFICADOR = 32;
   public static final int NOT = 22;
   public static final int AND = 19;
   public static final int FINMIENTRAS = 9;
-  public static final int LETRAS_MIENTRAS = 45;
+  public static final int LETRAS_MIENTRAS = 46;
   public static final int IGUALDAD = 14;
   public static final int OR = 18;
   public static final int MIENTRAS = 7;
-  public static final int ARIAL = 58;
-  public static final int CIRCULO = 53;
-  public static final int LETRAS_BLOQUE = 50;
+  public static final int ARIAL = 59;
+  public static final int CIRCULO = 54;
+  public static final int LETRAS_BLOQUE = 51;
   public static final int SUMA = 25;
   public static final int UMENOS = 34;
   public static final int EOF = 0;
   public static final int DECIMAL = 30;
   public static final int error = 1;
-  public static final int COMA = 62;
-  public static final int COLOR_BLOQUE = 48;
-  public static final int COMIC_SANS = 60;
-  public static final int LETRAS_SIZE_BLOQUE = 51;
-  public static final int COLOR_MIENTRAS = 43;
-  public static final int COLOR_TEXTO_MIENTRAS = 42;
+  public static final int COMA = 63;
+  public static final int COLOR_BLOQUE = 49;
+  public static final int COMIC_SANS = 61;
+  public static final int LETRAS_SIZE_BLOQUE = 52;
+  public static final int COLOR_MIENTRAS = 44;
+  public static final int COLOR_TEXTO_MIENTRAS = 43;
   public static final int MAYOR_QUE = 21;
   public static final int ENTEROS = 29;
-  public static final int VERDANA = 61;
-  public static final int TIMES_NEW_ROMAN = 59;
+  public static final int VERDANA = 62;
+  public static final int TIMES_NEW_ROMAN = 60;
   public static final int ASIGNACION = 13;
-  public static final int ROMBO = 56;
-  public static final int LETRAS_SI = 40;
-  public static final int RECTANGULO = 55;
+  public static final int ROMBO = 57;
+  public static final int LETRAS_SI = 41;
+  public static final int RECTANGULO = 56;
   public static final int MAYOR_IGUAL_QUE = 17;
-  public static final int FIGURA_MIENTRAS = 44;
-  public static final int DEFAULT = 36;
+  public static final int FIGURA_MIENTRAS = 45;
+  public static final int DEFAULT = 37;
   public static final int LEER = 11;
-  public static final int ECLIPSE = 52;
+  public static final int ECLIPSE = 53;
   public static final int HACER = 8;
   public static final int HEXADECIMAL = 31;
-  public static final int COLOR_SI = 38;
-  public static final int PARALELOGRAMO = 54;
-  public static final int LETRAS_SIZE_SI = 41;
+  public static final int COLOR_SI = 39;
+  public static final int PARALELOGRAMO = 55;
+  public static final int LETRAS_SIZE_SI = 42;
   public static final int MENOR_QUE = 20;
   public static final int INICIO = 2;
   public static final int TEXTO = 33;
   public static final int FINSI = 6;
   public static final int DIVISION = 28;
-  public static final int COLOR_TEXTO_SI = 37;
-  public static final int FIGURA_SI = 39;
+  public static final int COLOR_TEXTO_SI = 38;
+  public static final int FIGURA_SI = 40;
   public static final int MENOR_IGUAL_QUE = 16;
   public static final int VAR = 12;
   public static final int MULTIPLICACION = 27;
@@ -108,6 +109,7 @@ public class sym {
   "IDENTIFICADOR",
   "TEXTO",
   "UMENOS",
+  "DEFINICION_ID",
   "SEPARADOR",
   "DEFAULT",
   "COLOR_TEXTO_SI",

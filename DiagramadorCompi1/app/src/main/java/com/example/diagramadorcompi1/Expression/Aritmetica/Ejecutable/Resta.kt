@@ -40,9 +40,9 @@ class Resta(
                     TypeData.DECIMAL ->{
                         this.typeValue = Type(TypeData.DECIMAL)
                         if (leftValue is Number && rightValue is Number){
-                            return  leftValue.toDouble() - rightValue.toDouble()
+                            return  (leftValue as Number).toDouble() - (rightValue as Number).toDouble()
                         } else {
-                            throw Exception("No se pueden restar valores no numericos")
+                            return SintaxError("SINTACTICO","No se pueden restar valores no numericos", this.linea, this.columna)
                         }
                     }
                     else ->{

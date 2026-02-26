@@ -7,7 +7,6 @@ import com.example.diagramadorcompi1.Instruccion.Print;
 import com.example.diagramadorcompi1.Instruccion.Variable.*;
 import com.example.diagramadorcompi1.Expression.Native;
 import com.example.diagramadorcompi1.Expression.Aritmetica.OperacionMathNoRetornable;
-import com.example.diagramadorcompi1.Expression.Aritmetica.OperacionUMenos;
 import com.example.diagramadorcompi1.Flujos.Estructuira_SI;
 import com.example.diagramadorcompi1.Flujos.Estructura_Mientras;
 import com.example.diagramadorcompi1.Expression.Aritmetica.Ejecutable.Suma;
@@ -17,7 +16,7 @@ import com.example.diagramadorcompi1.Expression.Aritmetica.Ejecutable.Multiplica
 import com.example.diagramadorcompi1.Expression.Aritmetica.Ejecutable.Division;
 import com.example.diagramadorcompi1.Instruccion.RGB;
 import java.util.List;
-import java.util.ArrayList;
+//import java.util.ArrayList;
 import java.util.LinkedList;
 
 parser code
@@ -45,7 +44,7 @@ action code
 :}
 
 terminal INICIO, FIN;
-terminal SI, ENTONCES, FINSI; //posible uso de forma separada el FIN SI o debe de ir junto
+terminal SI, ENTONCES, FINSI;
 terminal MIENTRAS, HACER, FINMIENTRAS;
 terminal MOSTRAR, LEER, VAR;
 terminal ASIGNACION;
@@ -54,6 +53,7 @@ terminal OR, AND, MENOR_QUE, MAYOR_QUE, NOT;
 terminal LPAREN, RPAREN;
 terminal SUMA, RESTA, MULTIPLICACION, DIVISION;
 terminal ENTEROS, DECIMAL, HEXADECIMAL, IDENTIFICADOR, TEXTO, UMENOS;
+terminal DEFINICION_ID;
 terminal SEPARADOR;
 terminal DEFAULT;
 terminal COLOR_TEXTO_SI, COLOR_SI, FIGURA_SI, LETRAS_SI, LETRAS_SIZE_SI;
@@ -78,7 +78,7 @@ nonterminal Instruccion expresion_paren, config_def;
 nonterminal Instruccion nombre_figuras, tipos_letras;
 nonterminal Instruccion tipos_color, color_RGB;
 nonterminal Instruccion operaciones, operaciones_1, operaciones_2;
-nonterminal Instruccion numericos;
+nonterminal Instruccion numericos, estruc_fin_si, estruc_fin_mientras;
 
 precedence left OR, AND;
 precedence left MAYOR_IGUAL_QUE;
@@ -133,27 +133,35 @@ estruc_mostrar ::= MOSTRAR TEXTO:a {: RESULT = new Native(a,new Type(TypeData.ST
 estruc_leer ::= LEER IDENTIFICADOR:a {: RESULT = new Native(a,new Type(TypeData.STRING), aleft, aright); :}
              ;
 
-estruc_si ::= SI condicion:a ENTONCES codigo_start:b FINSI {: RESULT = new Estructuira_SI(a, b, aleft, aright); :}
+estruc_si ::= SI condicion:a ENTONCES codigo_start:b estruc_fin_si {: RESULT = new Estructuira_SI(a, b, aleft, aright); :}
            ;
-
-estruc_mientras ::= MIENTRAS condicion:a HACER codigo_start:b FINMIENTRAS {: RESULT = new Estructura_Mientras(a, b, aleft, aright); :}
+//quitar
+estruc_fin_si ::= FINSI
+                | FIN SI
+                ;
+//quitar
+estruc_mientras ::= MIENTRAS condicion:a HACER codigo_start:b estruc_fin_mientras {: RESULT = new Estructura_Mientras(a, b, aleft, aright); :}
                  ;
+
+estruc_fin_mientras ::= FINMIENTRAS
+                | FIN MIENTRAS
+                ;
 
 condicion ::= NOT condicion_compleja:a {: RESULT = a; :}
             | condicion_compleja:a {: RESULT = a; :}
             ;
 
-condicion_compleja ::= condicion_compleja:a AND expresion_relacional:b {: RESULT = new OperacionMathNoRetornable( a, b, aleft, aright); :}
-                     | condicion_compleja:a OR expresion_relacional:b {: RESULT = new OperacionMathNoRetornable( a, b, aleft, aright); :}
+condicion_compleja ::= condicion_compleja:a AND expresion_relacional:b {: RESULT = new OperacionMathNoRetornable( a, b,"&&", aleft, aright); :}
+                     | condicion_compleja:a OR expresion_relacional:b {: RESULT = new OperacionMathNoRetornable( a, b, "||", aleft, aright); :}
                      | expresion_relacional:a {: RESULT = a; :}
                      ;
 
-expresion_relacional ::= expresion_relacional:a IGUALDAD expresion_paren:b {: RESULT = new OperacionMathNoRetornable( a, b, aleft, aright); :}
-                       | expresion_relacional:a DIFERENTE expresion_paren:b {: RESULT = new OperacionMathNoRetornable( a, b, aleft, aright); :}
-                       | expresion_relacional:a MAYOR_IGUAL_QUE expresion_paren:b {: RESULT = new OperacionMathNoRetornable( a, b, aleft, aright); :}
-                       | expresion_relacional:a MENOR_IGUAL_QUE expresion_paren:b {: RESULT = new OperacionMathNoRetornable( a, b, aleft, aright); :}
-                       | expresion_relacional:a MAYOR_QUE expresion_paren:b {: RESULT = new OperacionMathNoRetornable( a, b, aleft, aright); :}
-                       | expresion_relacional:a MENOR_QUE expresion_paren:b {: RESULT = new OperacionMathNoRetornable( a, b, aleft, aright); :}
+expresion_relacional ::= expresion_relacional:a IGUALDAD expresion_paren:b {: RESULT = new OperacionMathNoRetornable( a, b,"==", aleft, aright); :}
+                       | expresion_relacional:a DIFERENTE expresion_paren:b {: RESULT = new OperacionMathNoRetornable( a, b, "!=", aleft, aright); :}
+                       | expresion_relacional:a MAYOR_IGUAL_QUE expresion_paren:b {: RESULT = new OperacionMathNoRetornable( a, b, ">=", aleft, aright); :}
+                       | expresion_relacional:a MENOR_IGUAL_QUE expresion_paren:b {: RESULT = new OperacionMathNoRetornable( a, b, "<=", aleft, aright); :}
+                       | expresion_relacional:a MAYOR_QUE expresion_paren:b {: RESULT = new OperacionMathNoRetornable( a, b, ">", aleft, aright); :}
+                       | expresion_relacional:a MENOR_QUE expresion_paren:b {: RESULT = new OperacionMathNoRetornable( a, b, "<", aleft, aright); :}
                        | expresion_paren:a {: RESULT = a; :}
                        ;
 
@@ -161,14 +169,14 @@ expresion_paren ::= LPAREN condicion:a RPAREN {: RESULT = a; :}
                   | valores_variable:a {: RESULT = a; :}
                   ;
 
-op_math_bloque_1 ::= RESTA op_math_bloque_1:a {: RESULT = new OperacionUMenos(a, aleft, aright); :} %prec UMENOS
-                  | op_math_bloque_1:a SUMA op_math_bloque_2:b {: RESULT = new OperacionMathNoRetornable( a, b, aleft, aright); :}
-                  | op_math_bloque_1:a RESTA op_math_bloque_2:b  {: RESULT = new OperacionMathNoRetornable(a, b, aleft, aright); :}
+op_math_bloque_1 ::= RESTA op_math_bloque_1:a {: RESULT = new Negacion(a, aleft, aright); :} %prec UMENOS
+                  | op_math_bloque_1:a SUMA op_math_bloque_2:b {: RESULT = new OperacionMathNoRetornable( a, b, "+", aleft, aright); :}
+                  | op_math_bloque_1:a RESTA op_math_bloque_2:b  {: RESULT = new OperacionMathNoRetornable(a, b, "-", aleft, aright); :}
                   | op_math_bloque_2:a {: RESULT = a; :}
                 ;
 
-op_math_bloque_2 ::= op_math_bloque_2:a MULTIPLICACION op_math_bloque_3:b {: RESULT = new OperacionMathNoRetornable(a, b, aleft, aright); :}
-                   | op_math_bloque_2:a DIVISION op_math_bloque_3:b {: RESULT = new OperacionMathNoRetornable(a, b, aleft, aright); :}
+op_math_bloque_2 ::= op_math_bloque_2:a MULTIPLICACION op_math_bloque_3:b {: RESULT = new OperacionMathNoRetornable(a, b, "*", aleft, aright); :}
+                   | op_math_bloque_2:a DIVISION op_math_bloque_3:b {: RESULT = new OperacionMathNoRetornable(a, b, "/", aleft, aright); :}
                    | op_math_bloque_3:a {: RESULT = a; :}
                    ;
 
@@ -179,6 +187,7 @@ op_math_bloque_3 ::= LPAREN op_math_bloque_1:a RPAREN {: RESULT = a; :}
 valores_variable ::= IDENTIFICADOR:a {: RESULT = new AccesVariable((String) a, aleft, aright); :}
                 |DECIMAL:a {: RESULT = new Native(Double.parseDouble(a.toString()), new Type(TypeData.DECIMAL), aleft, aright); :}
                 | ENTEROS:a {: RESULT = new Native(Integer.parseInt(a.toString()), new Type(TypeData.ENTERO), aleft, aright); :}
+                | DEFINICION_ID:a {: RESULT = new Native(a,new Type(TypeData.STRING), aleft, aright); :}
                 ;
 configuracion_personalizada ::= configuracion_personalizada:a config_def:b {: RESULT = a; RESULT.add(b); :}
                               | config_def:a {: RESULT = new LinkedList<Instruccion>(); RESULT.add(a); :}
@@ -197,6 +206,9 @@ config_def ::= DEFAULT ASIGNACION ENTEROS:a {: RESULT = new Native(Integer.parse
              | COLOR_MIENTRAS ASIGNACION tipos_color:a SEPARADOR_CONFIG ENTEROS {: RESULT = a; :}
              | COLOR_TEXTO_BLOQUE ASIGNACION tipos_color:a SEPARADOR_CONFIG ENTEROS {: RESULT = a; :}
              | COLOR_BLOQUE ASIGNACION tipos_color:a SEPARADOR_CONFIG ENTEROS {: RESULT = a; :}
+             | LETRAS_SIZE_SI ASIGNACION numericos:a SEPARADOR_CONFIG ENTEROS {: RESULT = a; :}
+             | LETRAS_SIZE_MIENTRAS ASIGNACION numericos:a SEPARADOR_CONFIG ENTEROS {: RESULT = a; :}
+             | LETRAS_SIZE_BLOQUE ASIGNACION numericos:a SEPARADOR_CONFIG ENTEROS {: RESULT = a; :}
             ;
 
 nombre_figuras ::= ECLIPSE:a {: RESULT = new Native(a, new Type(TypeData.FIGURAS), aleft, aright); :}

@@ -9,5 +9,9 @@ abstract class Instruccion(
     val linea: Int,
     val columna: Int
 ) {
+    /**
+     * @param tree
+     * @param table
+     */
     abstract fun interprete(tree: Tree, table: TableSymbol): Any?
 }

@@ -1,5 +1,7 @@
 package com.example.diagramadorcompi1.Flujos
 
+import com.example.diagramadorcompi1.Expression.Aritmetica.OperacionMathNoRetornable
+import com.example.diagramadorcompi1.Instruccion.Reportes.Control
 import com.example.diagramadorcompi1.Modelos.TableSymbol
 import com.example.diagramadorcompi1.Modelos.Tree
 import com.example.diagramadorcompi1.Modelos.TypeData
@@ -7,6 +9,9 @@ import com.example.diagramadorcompi1.Modelos.Type
 import com.example.diagramadorcompi1.Patron.Instruccion
 import java.util.LinkedList
 
+/**
+ *
+ */
 class Estructura_Mientras (
     private val unique: Instruccion,
     private val instrucciones : LinkedList<Instruccion>?,
@@ -17,7 +22,10 @@ class Estructura_Mientras (
     linea,
     columna
 ){
+
     override fun interprete(tree: Tree, table: TableSymbol): Any? {
+        val condicion = if(unique is OperacionMathNoRetornable) unique.toTexto() else "¿?"
+        tree.agregarControl(Control("MIENTRAS",linea,condicion))
 
         val uniqueVal = unique.interprete(tree, table)
 
@@ -25,6 +33,8 @@ class Estructura_Mientras (
             if (instrucciones != null)
                 for(instruc in instrucciones)
                     instruc.interprete(tree, table)
+
+
 
         return null
     }

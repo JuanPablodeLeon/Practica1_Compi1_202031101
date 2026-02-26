@@ -1,5 +1,7 @@
 package com.example.diagramadorcompi1.Flujos
 
+import com.example.diagramadorcompi1.Expression.Aritmetica.OperacionMathNoRetornable
+import com.example.diagramadorcompi1.Instruccion.Reportes.Control
 import com.example.diagramadorcompi1.Modelos.TableSymbol
 import com.example.diagramadorcompi1.Modelos.Tree
 import com.example.diagramadorcompi1.Modelos.Type
@@ -18,12 +20,16 @@ class Estructuira_SI (
     columna
 ){
     override fun interprete(tree: Tree, table: TableSymbol): Any? {
+        val condicion = if(unique is OperacionMathNoRetornable) unique.toTexto() else "¿?"
+        tree.agregarControl(Control("SI",linea,condicion))
+
         val uniqueVal = unique.interprete(tree, table)
 
         if (uniqueVal == true)
             if (instrucciones != null)
                 for(instruc in instrucciones)
                     instruc.interprete(tree, table)
+
 
         return null
     }
