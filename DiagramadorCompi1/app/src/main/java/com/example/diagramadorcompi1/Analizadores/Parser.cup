@@ -10,6 +10,12 @@ import com.example.diagramadorcompi1.Expression.Aritmetica.OperacionMathNoRetorn
 import com.example.diagramadorcompi1.Expression.Aritmetica.OperacionUMenos;
 import com.example.diagramadorcompi1.Flujos.Estructuira_SI;
 import com.example.diagramadorcompi1.Flujos.Estructura_Mientras;
+import com.example.diagramadorcompi1.Expression.Aritmetica.Ejecutable.Suma;
+import com.example.diagramadorcompi1.Expression.Aritmetica.Ejecutable.Resta;
+import com.example.diagramadorcompi1.Expression.Aritmetica.Ejecutable.Negacion;
+import com.example.diagramadorcompi1.Expression.Aritmetica.Ejecutable.Multiplicacion;
+import com.example.diagramadorcompi1.Expression.Aritmetica.Ejecutable.Division;
+import com.example.diagramadorcompi1.Instruccion.RGB;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -59,7 +65,8 @@ nonterminal LinkedList<Instruccion> configuracion_personalizada;
 nonterminal Instruccion expresion_paren, config_def;
 nonterminal Instruccion nombre_figuras, tipos_letras;
 nonterminal Instruccion tipos_color, color_RGB;
-nonterminal Instruccion operaciones, operaciones_1;
+nonterminal Instruccion operaciones, operaciones_1, operaciones_2;
+nonterminal Instruccion numericos;
 
 precedence left OR, AND;
 precedence left MAYOR_IGUAL_QUE;
@@ -198,13 +205,24 @@ tipos_color ::= HEXADECIMAL:a {:RESULT = new Native(a, new Type(TypeData.STRING)
               | color_RGB:a {: RESULT = a; :}
               ;
 
-color_RGB ::= operaciones COMA operaciones COMA operaciones
+color_RGB ::= operaciones:a COMA operaciones:b COMA operaciones:c {: RESULT = new RGB(a, b, c, aleft, aright); :}
             ;
 
-operaciones ::= RESTA operaciones:a {: RESULT = new OperacionUMenos(a, aleft, aright); :} %orec UMENOS
-              | operaciones:a SUMA operaciones_1:b {: RESULT = new SUMA(a, b, aleft, aright); :}
-              | operaciones:a RESTA operaciones_1:b {: RESULT = new RESTA(a, b, aleft, aright); :}
+operaciones ::= RESTA operaciones:a {: RESULT = new Negacion(a, aleft, aright); :} %prec UMENOS
+              | operaciones:a SUMA operaciones_1:b {: RESULT = new Suma(a, b, aleft, aright); :}
+              | operaciones:a RESTA operaciones_1:b {: RESULT = new Resta(a, b, aleft, aright); :}
               | operaciones_1:a {: RESULT = a; :}
               ;
 
-operaciones_1 ::= operaciones_1 MULTIPLICACION
+operaciones_1 ::= operaciones_1:a MULTIPLICACION operaciones_2:b {: RESULT = new Multiplicacion(a, b, aleft, aright); :}
+                | operaciones_1:a DIVISION operaciones_2:b {: RESULT = new Division(a, b, aleft, aright); :}
+                | operaciones_2:a {: RESULT = a; :}
+                ;
+
+operaciones_2 ::= LPAREN operaciones:a RPAREN {: RESULT = a; :}
+                | numericos:a {: RESULT = a; :}
+                ;
+
+numericos ::= DECIMAL:a {: RESULT = new Native(Double.parseDouble(a.toString()), new Type(TypeData.DECIMAL), aleft, aright); :}
+            | ENTEROS:a {: RESULT = new Native(Integer.parseInt(a.toString()), new Type(TypeData.ENTERO), aleft, aright); :}
+            ;
