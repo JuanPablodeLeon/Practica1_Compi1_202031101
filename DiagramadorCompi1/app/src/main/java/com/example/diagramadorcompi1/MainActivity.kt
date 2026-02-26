@@ -211,10 +211,11 @@ fun InterfazApp(modifier: Modifier = Modifier){
                 Text("Reportes", fontSize = 18.sp)
             }
 
-            // 🟣 BOTÓN 2 (puede ser limpiar consola)
+            // Boton para Eliminar el texto de la Consola y de donde Lee el pseudocodigo
             Button(
                 onClick = {
                     consoleText = "Consola limpia...\n"
+                    inputText = " "
                 },
                 modifier = Modifier
                     .weight(1f)
@@ -222,7 +223,7 @@ fun InterfazApp(modifier: Modifier = Modifier){
                     .padding(start = 8.dp),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Text("2", fontSize = 18.sp)
+                Text("Limpiar", fontSize = 18.sp)
             }
         }
     }
