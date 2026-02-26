@@ -8,9 +8,9 @@ Acceso al APK
 
 - [Descarga Apk](https://github.com/JuanPablodeLeon/Practica1_Compi1_202031101/releases)
 
-## 📱 Interfaz de la Aplicación
+## Interfaz de la Aplicación
 
-Al abrir la app verás tres secciones:
+Al abrir la aplicacion luego de instalarla podras ver lo siguiente
 
 <p align="center">
   <img src="/Documentacio/Preview.jpg" alt="Preview App" width="400"/>
