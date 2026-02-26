@@ -67,12 +67,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun InterfazApp(modifier: Modifier = Modifier){
 
+    //variable que contendra el texto a ingresar
     var inputText by remember { mutableStateOf(
-       /* "INICIO\n" +
-                "VAR a = 5 + 8 * (12 - 1) / 3\n" +
-                "FIN\n" +
-                "%%%%\n" +
-                "%DEFAULT = 1"*/
         """
             INICIO
             VAR a = 10
@@ -93,7 +89,7 @@ fun InterfazApp(modifier: Modifier = Modifier){
             %DEFAULT=3
         """.trimIndent()
     ) }
-
+    //variable que contrendra el texto de los reportes y errores
     var consoleText by remember { mutableStateOf("Consola....\n") }
 
     Column(
@@ -120,7 +116,6 @@ fun InterfazApp(modifier: Modifier = Modifier){
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
@@ -180,17 +175,19 @@ fun InterfazApp(modifier: Modifier = Modifier){
                         val lexer = Lexer(StringReader(inputText))
                         val parser = Parser(lexer)
                         var result: Symbol? = null
+                        //para evitar el error generico y usar los sintacticos y lexicos
                         try {
                             result = parser.parse()
                         } catch (e : Exception){
 
                         }
-
-                        //probabilidad de que el reporte sea de esta forma
+                        //Verifica si el valor no es nulo y si ambas listas de errores se encuentran vacias
                         if (result != null && lexer.listaErrorLexico.isEmpty() && parser.listErrorSintactico.isEmpty()){
+                            //crea arbol ast a base lo leido por parser
                             val ast = Tree(result.value as LinkedList<Instruccion>)
-                            val table = TableSymbol()
+                            val table = TableSymbol() //tabla de simbolos
 
+                            //itera todos los elementos del arbol para poder interpretarlos
                             for (instruction in ast.instrucciones) {
                                 instruction.interprete(ast, table)
                             }
@@ -200,7 +197,7 @@ fun InterfazApp(modifier: Modifier = Modifier){
                             if (ast.reporteAritmeticos.isEmpty()){
                                 consoleText += "Sin operaciones aritmeticas"
                             } else{
-                                for(report in ast.reporteAritmeticos){
+                                for(report in ast.reporteAritmeticos){ //muestra todos los operadores aritmeticos en formato para mayor legibilidad
                                     consoleText += "\n| Operador : ${report.operador} \n| Linea : ${report.linea}\n| Columna : ${report.columna}\n| Ocurrencia : ${report.ocurrencia}\n=================================\n"
                                 }
                             }
@@ -210,20 +207,20 @@ fun InterfazApp(modifier: Modifier = Modifier){
                             if (ast.reporteControl.isEmpty()){
                                 consoleText += "Sin estructuras de Control"
                             } else{
-                                for(report in ast.reporteControl){
+                                for(report in ast.reporteControl){ //muestra todas las estrucuturas de control en formato para mayor legibilidad
                                     consoleText += "\n| Objeto : ${report.objeto} \n| Linea : ${report.linea}\n| Condicion : ${report.condicion}\n=================================\n"
                                 }
                             }
                         }
 
-                        if(lexer.listaErrorLexico.isNotEmpty()){
+                        if(lexer.listaErrorLexico.isNotEmpty()){ //en caso de existir errores lexicos se mostraran
                             consoleText += "\n---- ERROR LEXICO ----\n"
                             for(error in lexer.listaErrorLexico){
                                 consoleText += "${error.mensaje} en :  línea ${error.linea} | columna ${error.columna} \n"
                             }
                         }
 
-                        if(parser.listErrorSintactico.isNotEmpty()){
+                        if(parser.listErrorSintactico.isNotEmpty()){ //en caso de existir errores sintacticos se mostraran
                             consoleText += "\n---- ERROR SINTACTICO ----\n"
                             for(error in parser.listErrorSintactico){
                                 consoleText += "${error.mensaje} en :  línea ${error.linea} | columna ${error.columna} \n"
@@ -246,7 +243,7 @@ fun InterfazApp(modifier: Modifier = Modifier){
             }
             //boton para mostrar unicamente los tokens ingresados
             Button(
-                onClick = {
+                onClick = { //misma funcionalidad que el boton de reportes, solo cambiando a tokens
                     consoleText = "++++++++++++++++++++++++++\n===== LISTADO TOKENS =====\n++++++++++++++++++++++++++\n\n"
                     try {
                         val lexer = Lexer(StringReader(inputText))
@@ -304,7 +301,7 @@ fun InterfazApp(modifier: Modifier = Modifier){
             ) {
                 Text("Tokens", fontSize = 14.sp)
             }
-            // Boton para Eliminar el texto de la Consola y de donde Lee el pseudocodigo
+            // Boton para Eliminar el texto de entrada, pero deja los reportes o tokens analizados previamente
             Button(
                 onClick = {
                     inputText = " "
