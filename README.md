@@ -1,17 +1,19 @@
-# 📊 Diagramador Compi 1 — Manual de Usuario
+# Diagramador Compi 1 — Manual de Usuario
 
 Aplicación Android para interpretar pseudocódigo estructurado y generar reportes de operadores matemáticos, estructuras de control y errores.
 
 ---
 ## APK
-- [Descarga Apk] (https://github.com/JuanPablodeLeon/Practica1_Compi1_202031101/releases)
+Acceso al APK
+
+- [Descarga Apk](https://github.com/JuanPablodeLeon/Practica1_Compi1_202031101/releases)
 
 ## 📱 Interfaz de la Aplicación
 
 Al abrir la app verás tres secciones:
 
 <p align="center">
-  <img src="/Documentacion/Preview.jpg" alt="Preview App" width="400"/>
+  <img src="/Documentacio/Preview.jpg" alt="Preview App" width="400"/>
 </p>
 
 
@@ -19,7 +21,9 @@ Al abrir la app verás tres secciones:
 
 
  **Reportes** -> Analiza el código y muestra el reporte de operadores matemáticos y estructuras de control (o errores si los hay) 
- **Tokens**  -> Muestra todos los tokens que el analizador léxico reconocio
+ 
+ **Tokens**  -> Muestra todos los tokens que el analizador léxico reconoció
+ 
  **Limpiar**  -> Borra el texto ingresado, pero deja el ultimo texto analizado en consola
 
 ---
@@ -30,10 +34,10 @@ El archivo tiene **dos secciones separadas por `%%%%`**:
 
 ```
 INICIO
-    ... tu algoritmo aquí ...
+    ... codigo ...
 FIN
 %%%%
-... configuración del diagrama ...
+... configuracion de diagramas ...
 ```
 
 **El lenguaje es case sensitive.**
@@ -103,9 +107,13 @@ VAR x = 5  # también al final de una línea
 | Símbolo | Descripción    | Precedencia |
 
 | `+`     | Suma           | 1 (menor)   |
+
 | `-`     | Resta          | 1           |
+
 | `*`     | Multiplicación | 2           |
+
 | `/`     | División       | 2           |
+
 | `()`    | Paréntesis     | 3 (mayor)   |
 
 **Ejemplos:**
@@ -163,10 +171,15 @@ FINMIENTRAS
 | Símbolo | Descripción       |
 
 | `==`    | Igual a           |
+
 | `!=`    | Diferente de      |
+
 | `>`     | Mayor que         |
+
 | `<`     | Menor que         |
+
 | `>=`    | Mayor o igual que |
+
 | `<=`    | Menor o igual que |
 
 ### Lógicos
@@ -174,7 +187,9 @@ FINMIENTRAS
 | Símbolo | Descripción |
 
 | `&&`    | AND         |
-| `\|\|`  | OR          |
+
+| `||`  | OR          |
+
 | `!`     | NOT         |
 
 **Ejemplos de condiciones:**
@@ -205,17 +220,29 @@ El número al final de cada instrucción (después de `|`) es el **índice** del
 | Instrucción | Descripción |
 
 | `%DEFAULT=<indice>` | Aplica estilo por defecto al elemento indicado |
+
 | `%COLOR_TEXTO_SI=<color>\|<indice>` | Color del texto del nodo SI |
+
 | `%COLOR_SI=<color>\|<indice>` | Color de fondo del nodo SI |
+
 | `%FIGURA_SI=<figura>\|<indice>` | Forma del nodo SI |
+
 | `%LETRAS_SI=<tipografia>\|<indice>` | Tipografía del nodo SI |
+
 | `%LETRAS_SIZE_SI=<decimal>\|<indice>` | Tamaño de letra del nodo SI |
+
 | `%COLOR_TEXTO_MIENTRAS=<color>\|<indice>` | Color del texto del nodo MIENTRAS |
+
 | `%COLOR_MIENTRAS=<color>\|<indice>` | Color de fondo del nodo MIENTRAS |
+
 | `%FIGURA_MIENTRAS=<figura>\|<indice>` | Forma del nodo MIENTRAS |
+
 | `%LETRAS_MIENTRAS=<tipografia>\|<indice>` | Tipografía del nodo MIENTRAS |
+
 | `%COLOR_TEXTO_BLOQUE=<color>\|<indice>` | Color del texto de un bloque |
+
 | `%COLOR_BLOQUE=<color>\|<indice>` | Color de fondo de un bloque |
+
 | `%FIGURA_BLOQUE=<figura>\|<indice>` | Forma de los bloques |
 
 ### Colores
